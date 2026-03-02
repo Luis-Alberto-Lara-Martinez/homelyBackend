@@ -1,4 +1,4 @@
-package org.educa.homely_backend;
+package org.educa.homelyBackend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -67,7 +67,7 @@ mvnw.cmd spring-boot:run
 
 ### 🔐 Licencia
 
-Este proyecto está licenciado bajo la **MIT License** - ver el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está licenciado bajo la **MIT License**
 
 ### 👥 Autores
 
@@ -140,12 +140,10 @@ mvnw.cmd spring-boot:run
 
 ### 🔐 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for more details.
+This project is licensed under the **MIT License**
 
 ### 👥 Authors
 
 - **Luis Alberto Lara Martínez** - [GitHub](https://github.com/Luis-Alberto-Lara-Martinez/)
 - **Samuel Ariza Lozano** - [GitHub](https://github.com/Samuel957exe)
 - **Alejandro Cabrera Jiménez** - [GitHub](https://github.com/AlejandroCabreraJimenez)
-
-

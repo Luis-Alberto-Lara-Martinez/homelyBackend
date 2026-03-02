@@ -1,4 +1,4 @@
-package org.educa.homely_backend;
+package org.educa.homelyBackend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

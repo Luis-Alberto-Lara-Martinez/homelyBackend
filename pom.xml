@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0-M2</version>
+        <version>4.0.3</version>
         <relativePath/>
     </parent>
     <groupId>org.educa</groupId>
-    <artifactId>homely-backend</artifactId>
+    <artifactId>homelyBackend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>homely-backend</name>
-    <description>Backend de Homely</description>
+    <name>homelyBackend</name>
+    <description>Backend de la aplicación Homely</description>
     <url>https://github.com/Luis-Alberto-Lara-Martinez/homely-backend.git</url>
     <licenses>
         <license>
@@ -70,7 +70,6 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
