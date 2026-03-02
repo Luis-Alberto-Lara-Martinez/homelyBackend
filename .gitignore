@@ -33,4 +33,5 @@ build/
 .vscode/
 
 ### Archivos de prueba ###
-src/main/java/org/educa/homely_backend/controller/PruebasController.java
+src/main/java/org/educa/homelyBackend/controller/PruebasController.java
+src/main/java/org/educa/homelyBackend/controller/PruebaController.java
