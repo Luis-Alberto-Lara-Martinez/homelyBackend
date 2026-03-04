@@ -60,7 +60,7 @@ class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors
                         .configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authz -> authz
+                .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll())
                 .httpBasic(AbstractHttpConfigurer::disable);
         return http.build();
@@ -80,7 +80,7 @@ class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors
                         .configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authz -> authz
+                .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .authenticationManagerResolver(jwtIssuerAuthenticationManagerResolver))
@@ -98,7 +98,7 @@ class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors
                         .configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authz -> authz
+                .authorizeHttpRequests(auth -> auth
                         .anyRequest().hasRole("ADMINISTRADOR"))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable);
@@ -115,7 +115,7 @@ class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors
                         .configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authz -> authz
+                .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable);
