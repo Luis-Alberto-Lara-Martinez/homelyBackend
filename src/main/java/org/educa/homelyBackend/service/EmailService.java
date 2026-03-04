@@ -13,6 +13,7 @@ import java.time.Year;
 
 @Service
 public class EmailService {
+
     private static final String FROM_EMAIL = "Homely <comunications@homelyweb.app>";
     private static final int ACTUAL_YEAR = Year.now().getValue();
 
