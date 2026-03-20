@@ -1,11 +1,10 @@
 package org.educa.homelyBackend.repository;
 
 import org.educa.homelyBackend.entity.Users;
-import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<Users, Integer> {
-    @NonNull List<Users> findAll();
+    Optional<Users> findByEmail(String email);
 }

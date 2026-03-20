@@ -1,22 +1,26 @@
 package org.educa.homelyBackend.service;
 
-import org.educa.homelyBackend.dao.UserDAO;
-import org.educa.homelyBackend.dao.UserDAOImpl;
 import org.educa.homelyBackend.entity.Users;
+import org.educa.homelyBackend.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserService {
 
-    private final UserDAO userDAO;
+    private final UserRepository userRepository;
 
-    public UserService(UserDAOImpl userDAO) {
-        this.userDAO = userDAO;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public List<Users> findAll() {
-        return userDAO.findAll();
+        return userRepository.findAll();
+    }
+
+    public Optional<Users> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
