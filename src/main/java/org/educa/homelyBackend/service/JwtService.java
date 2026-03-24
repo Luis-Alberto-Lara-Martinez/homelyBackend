@@ -31,6 +31,10 @@ public class JwtService {
         this.clock = Clock.systemUTC();
     }
 
+    public String generateToken(String email) {
+        return generateToken(email, null);
+    }
+
     public String generateToken(String email, Map<String, Object> extraClaims) {
         if (extraClaims == null) extraClaims = Map.of();
         Instant now = clock.instant();
