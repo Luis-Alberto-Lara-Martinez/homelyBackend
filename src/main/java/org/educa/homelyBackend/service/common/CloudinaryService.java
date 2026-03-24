@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.service;
+package org.educa.homelyBackend.service.common;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.stereotype.Service;

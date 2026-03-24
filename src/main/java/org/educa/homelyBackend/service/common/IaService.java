@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.service;
+package org.educa.homelyBackend.service.common;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;

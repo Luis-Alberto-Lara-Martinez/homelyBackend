@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.service;
+package org.educa.homelyBackend.service.common;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

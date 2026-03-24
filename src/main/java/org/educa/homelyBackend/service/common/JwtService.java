@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.service;
+package org.educa.homelyBackend.service.common;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
