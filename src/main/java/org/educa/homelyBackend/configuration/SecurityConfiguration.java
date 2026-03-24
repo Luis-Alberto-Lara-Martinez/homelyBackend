@@ -65,22 +65,6 @@ class SecurityConfiguration {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain publicChain(HttpSecurity http) {
-        http
-                .securityMatcher("/public/**")
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll())
-                .httpBasic(AbstractHttpConfigurer::disable);
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
     public SecurityFilterChain oauth2Chain(HttpSecurity http) {
         JwtIssuerAuthenticationManagerResolver jwtIssuerAuthenticationManagerResolver =
                 JwtIssuerAuthenticationManagerResolver.fromTrustedIssuers(
@@ -102,7 +86,7 @@ class SecurityConfiguration {
     }
 
     @Bean
-    @Order(3)
+    @Order(2)
     public SecurityFilterChain adminChain(HttpSecurity http) {
         http
                 .securityMatcher("/admin/**")
@@ -119,10 +103,10 @@ class SecurityConfiguration {
     }
 
     @Bean
-    @Order(4)
-    public SecurityFilterChain fallbackChain(HttpSecurity http) {
+    @Order(3)
+    public SecurityFilterChain apiChain(HttpSecurity http) {
         http
-                .securityMatcher("/**")
+                .securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -131,6 +115,22 @@ class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
+
+    @Bean
+    @Order(4)
+    public SecurityFilterChain defaultChain(HttpSecurity http) {
+        http
+                .securityMatcher("/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors
+                        .configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll())
                 .httpBasic(AbstractHttpConfigurer::disable);
         return http.build();
     }
