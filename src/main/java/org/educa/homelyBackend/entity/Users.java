@@ -36,7 +36,7 @@ public class Users {
     @JoinColumn(name = "id_status", nullable = false)
     private UserStatuses idStatus;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url")
     private String imageUrl;
 
     @Column(name = "name", nullable = false, length = 100)
@@ -44,6 +44,9 @@ public class Users {
 
     @Column(name = "email", nullable = false)
     private String email;
+
+    @Column(name = "hash_password")
+    private String hashPassword;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
