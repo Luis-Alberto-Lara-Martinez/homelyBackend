@@ -22,11 +22,13 @@ public class LoginController extends BaseController {
     private final UsersService usersService;
     private final UserRolesService userRolesService;
     private final UserStatusesService userStatusesService;
+    private final JwtService jwtService;
 
     public LoginController(UsersService usersService, UserRolesService userRolesService, UserStatusesService userStatusesService, JwtService jwtService) {
         this.usersService = usersService;
         this.userRolesService = userRolesService;
         this.userStatusesService = userStatusesService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/oauth2/login")
@@ -40,9 +42,10 @@ public class LoginController extends BaseController {
         if (name == null)
             return badRequestCustomized("El token no contiene el claim 'name'");
 
-        Optional<Users> user = usersService.findByEmail(email);
+        Optional<Users> searchedUser = usersService.findByEmail(email);
+        Users user;
 
-        if (user.isEmpty()) {
+        if (searchedUser.isEmpty()) {
             Optional<UserRoles> userRol = userRolesService.findByName("USER");
             Optional<UserStatuses> userStatus = userStatusesService.findByName("ACTIVE");
 
@@ -58,14 +61,19 @@ public class LoginController extends BaseController {
             newUser.setEmail(email);
 
             usersService.save(newUser);
+            user = newUser;
+        } else {
+            user = searchedUser.get();
         }
 
-        // TODO: terminar función
+        String token = jwtService.generateToken(user.getEmail(), Map.of(
+                "name", user.getName(),
+                "role", user.getIdRole().getName()
+        ));
 
-        Map<String, String> message = Map.of(
+        return ResponseEntity.ok(Map.of(
                 "message", "Inicio de sesión correcto",
-                "token", ""
-        );
-        return ResponseEntity.ok(message);
+                "token", token
+        ));
     }
 }
