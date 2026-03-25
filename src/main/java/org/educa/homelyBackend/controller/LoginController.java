@@ -1,5 +1,6 @@
 package org.educa.homelyBackend.controller;
 
+import org.educa.homelyBackend.dto.LoginTraditionalRequest;
 import org.educa.homelyBackend.entity.UserRoles;
 import org.educa.homelyBackend.entity.UserStatuses;
 import org.educa.homelyBackend.entity.Users;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -74,6 +76,25 @@ public class LoginController extends BaseController {
         return ResponseEntity.ok(Map.of(
                 "message", "Inicio de sesión correcto",
                 "token", token
+        ));
+    }
+
+    public ResponseEntity<Map<String, String>> loginTraditional(@RequestBody LoginTraditionalRequest request) {
+        String email = request.email();
+        String password = request.password();
+
+        if (email == null) return badRequestCustomized("El email es requerido");
+        if (password == null) return badRequestCustomized("La password es requerida");
+
+        Optional<Users> searchedUser = usersService.findByEmail(email);
+
+        if (searchedUser.isEmpty()) return badRequestCustomized("No existe ningún usuario con ese email");
+
+        // TODO: terminar función
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Inicio de sesión correcto",
+                "token", "TOKENAAAAA"
         ));
     }
 }
