@@ -32,7 +32,7 @@ public class LoginController extends BaseController {
     }
 
     @PostMapping("/oauth2/login")
-    public ResponseEntity<?> login(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Map<String, String>> oauth2LoginAndRegister(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getClaim("email");
         String name = jwt.getClaim("name");
 
