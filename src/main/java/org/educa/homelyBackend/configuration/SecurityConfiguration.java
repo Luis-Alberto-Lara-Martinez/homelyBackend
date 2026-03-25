@@ -96,7 +96,7 @@ class SecurityConfiguration {
                 .cors(cors -> cors
                         .configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().hasRole("ADMINISTRADOR"))
+                        .anyRequest().hasRole("ADMIN"))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(AbstractHttpConfigurer::disable);
         return http.build();
