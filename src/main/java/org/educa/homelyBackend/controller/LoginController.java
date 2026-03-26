@@ -79,6 +79,7 @@ public class LoginController extends BaseController {
         ));
     }
 
+    @PostMapping("/local/login")
     public ResponseEntity<Map<String, String>> loginTraditional(@RequestBody LoginTraditionalRequest request) {
         String email = request.email();
         String password = request.password();
@@ -90,11 +91,19 @@ public class LoginController extends BaseController {
 
         if (searchedUser.isEmpty()) return badRequestCustomized("No existe ningún usuario con ese email");
 
-        // TODO: terminar función
+        Users user = searchedUser.get();
+
+        if (!usersService.checkPassword(password, user.getHashPassword()))
+            return badRequestCustomized("La contraseña es incorrecta");
+
+        String token = jwtService.generateToken(user.getEmail(), Map.of(
+                "name", user.getName(),
+                "role", user.getIdRole().getName()
+        ));
 
         return ResponseEntity.ok(Map.of(
                 "message", "Inicio de sesión correcto",
-                "token", "TOKENAAAAA"
+                "token", token
         ));
     }
 }
