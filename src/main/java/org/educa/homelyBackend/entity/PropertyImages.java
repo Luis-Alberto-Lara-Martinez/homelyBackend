@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -12,6 +13,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@DynamicInsert
 @Table(name = "property_images", indexes = {
         @Index(name = "idx_property_images_property_display_order",
                 columnList = "id_property, display_order"),

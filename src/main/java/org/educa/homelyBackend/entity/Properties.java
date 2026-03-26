@@ -3,16 +3,18 @@ package org.educa.homelyBackend.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @Entity
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "properties", indexes = {
         @Index(name = "idx_properties_id_user",
                 columnList = "id_user"),
@@ -28,8 +30,6 @@ import java.time.Instant;
                 columnList = "id_address"),
         @Index(name = "idx_properties_created_at",
                 columnList = "created_at"),
-        @Index(name = "idx_properties_created_by",
-                columnList = "created_by"),
         @Index(name = "idx_properties_updated_by",
                 columnList = "updated_by")})
 public class Properties {
@@ -80,10 +80,24 @@ public class Properties {
     private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
-    private Users createdBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     private Users updatedBy;
+
+    @OneToMany(mappedBy = "idProperty")
+    private Set<Favorites> favorites = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "idProperty")
+    private Set<Messages> messages = new LinkedHashSet<>();
+
+    @ManyToMany
+    private Set<PropertyExtras> propertyExtras = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "idProperty")
+    private Set<PropertyImages> propertyImages = new LinkedHashSet<>();
+
+    @OneToOne(mappedBy = "idProperty")
+    private PropertyResidenceDetails propertyResidenceDetail;
+
+    @OneToOne(mappedBy = "idProperty")
+    private PropertyResidenceEnergyCertificateDetails propertyResidenceEnergyCertificateDetail;
 }

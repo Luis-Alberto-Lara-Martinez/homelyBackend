@@ -8,6 +8,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -67,4 +69,28 @@ public class Users {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     private Users updatedBy;
+
+    @OneToMany(mappedBy = "idUser")
+    private Set<Favorites> favorites = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "idSender")
+    private Set<Messages> messagesSender = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "idReceiver")
+    private Set<Messages> messagesReceiver = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "idUser")
+    private Set<Properties> propertiesIdUser = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "updatedBy")
+    private Set<Properties> propertiesUpdateBy = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "idUser")
+    private Set<ResetPasswordTokens> resetPasswordTokens = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "createdBy")
+    private Set<Users> usersCreatedBy = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "updatedBy")
+    private Set<Users> usersUpdatedBy = new LinkedHashSet<>();
 }

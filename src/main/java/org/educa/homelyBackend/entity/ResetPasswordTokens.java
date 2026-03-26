@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -12,6 +13,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@DynamicInsert
 @Table(name = "reset_password_tokens", indexes = {
         @Index(name = "idx_reset_password_tokens_id_user",
                 columnList = "id_user"),

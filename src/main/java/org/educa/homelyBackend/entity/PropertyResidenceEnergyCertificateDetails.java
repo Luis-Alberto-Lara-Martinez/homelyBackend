@@ -37,4 +37,7 @@ public class PropertyResidenceEnergyCertificateDetails {
 
     @Column(name = "emissions_efficiency_value")
     private Integer emissionsEfficiencyValue;
+
+    @OneToOne(mappedBy = "idEnergyCertificate")
+    private PropertyResidenceDetails propertyResidenceDetail;
 }

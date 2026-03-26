@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -51,4 +53,7 @@ public class PropertyAddresses {
 
     @Column(name = "longitude", precision = 10, scale = 7)
     private BigDecimal longitude;
+
+    @OneToMany(mappedBy = "idAddress")
+    private Set<Properties> properties = new LinkedHashSet<>();
 }

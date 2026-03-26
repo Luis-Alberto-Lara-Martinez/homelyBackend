@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -17,4 +20,7 @@ public class PropertyStatuses {
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
+
+    @OneToMany(mappedBy = "idStatus")
+    private Set<Properties> properties = new LinkedHashSet<>();
 }
