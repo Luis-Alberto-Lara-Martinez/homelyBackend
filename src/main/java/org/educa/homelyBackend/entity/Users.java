@@ -4,12 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "users", indexes = {
         @Index(name = "idx_users_id_role",
                 columnList = "id_role"),

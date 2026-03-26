@@ -33,7 +33,7 @@ public class UsersService {
         return usersRepository.findByEmail(email);
     }
 
-    public Optional<Users> processOath2(String name, String email) {
+    public Optional<Users> processNewUser(String name, String email, String password) {
         Optional<UserRoles> userRol = userRolesService.findByName("USER");
         Optional<UserStatuses> userStatus = userStatusesService.findByName("ACTIVE");
 
@@ -46,8 +46,12 @@ public class UsersService {
         newUser.setImageUrl("https://res.cloudinary.com/homely-cloudinary/image/upload/v1767874172/perfil.png");
         newUser.setName(name);
         newUser.setEmail(email);
+        if (password != null && !password.isBlank()) {
+            newUser.setHashPassword(passwordEncoder.encode(password));
+        }
 
         save(newUser);
+
         return Optional.of(newUser);
     }
 
