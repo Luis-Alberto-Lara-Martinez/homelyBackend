@@ -1,12 +1,8 @@
 package org.educa.homelyBackend.controller;
 
 import org.educa.homelyBackend.dto.LoginTraditionalRequest;
-import org.educa.homelyBackend.entity.UserRoles;
-import org.educa.homelyBackend.entity.UserStatuses;
 import org.educa.homelyBackend.entity.Users;
 import org.educa.homelyBackend.service.common.JwtService;
-import org.educa.homelyBackend.service.domain.UserRolesService;
-import org.educa.homelyBackend.service.domain.UserStatusesService;
 import org.educa.homelyBackend.service.domain.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,14 +18,10 @@ import java.util.Optional;
 public class LoginController extends BaseController {
 
     private final UsersService usersService;
-    private final UserRolesService userRolesService;
-    private final UserStatusesService userStatusesService;
     private final JwtService jwtService;
 
-    public LoginController(UsersService usersService, UserRolesService userRolesService, UserStatusesService userStatusesService, JwtService jwtService) {
+    public LoginController(UsersService usersService, JwtService jwtService) {
         this.usersService = usersService;
-        this.userRolesService = userRolesService;
-        this.userStatusesService = userStatusesService;
         this.jwtService = jwtService;
     }
 
@@ -48,35 +40,17 @@ public class LoginController extends BaseController {
         Users user;
 
         if (searchedUser.isEmpty()) {
-            Optional<UserRoles> userRol = userRolesService.findByName("USER");
-            Optional<UserStatuses> userStatus = userStatusesService.findByName("ACTIVE");
+            Optional<Users> nuevoUsuario = usersService.processOath2(name, email);
 
-            if (userRol.isEmpty()) return badRequestCustomized("No se encontró el rol 'USER' en la base de datos");
-            if (userStatus.isEmpty())
-                return badRequestCustomized("No se encontró el estado 'ACTIVE' en la base de datos");
+            if (nuevoUsuario.isEmpty())
+                return badRequestCustomized("No se pudo crear el usuario porque no se encontró el rol o el status especificados");
 
-            Users newUser = new Users();
-            newUser.setIdRole(userRol.get());
-            newUser.setIdStatus(userStatus.get());
-            newUser.setImageUrl("https://res.cloudinary.com/homely-cloudinary/image/upload/v1767874172/perfil.png");
-            newUser.setName(name);
-            newUser.setEmail(email);
-
-            usersService.save(newUser);
-            user = newUser;
+            user = nuevoUsuario.get();
         } else {
             user = searchedUser.get();
         }
 
-        String token = jwtService.generateToken(user.getEmail(), Map.of(
-                "name", user.getName(),
-                "role", user.getIdRole().getName()
-        ));
-
-        return ResponseEntity.ok(Map.of(
-                "message", "Inicio de sesión correcto",
-                "token", token
-        ));
+        return createLoginResponse(user);
     }
 
     @PostMapping("/local/login")
@@ -93,9 +67,16 @@ public class LoginController extends BaseController {
 
         Users user = searchedUser.get();
 
+        if (user.getHashPassword() == null)
+            return badRequestCustomized("El usuario no tiene contraseña local");
+
         if (!usersService.checkPassword(password, user.getHashPassword()))
             return badRequestCustomized("La contraseña es incorrecta");
 
+        return createLoginResponse(user);
+    }
+
+    private ResponseEntity<Map<String, String>> createLoginResponse(Users user) {
         String token = jwtService.generateToken(user.getEmail(), Map.of(
                 "name", user.getName(),
                 "role", user.getIdRole().getName()
