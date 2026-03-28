@@ -1,5 +1,6 @@
 package org.educa.homelyBackend.controller;
 
+import com.resend.core.exception.ResendException;
 import org.educa.homelyBackend.dto.LoginTraditionalRequest;
 import org.educa.homelyBackend.dto.RegisterTraditionalRequest;
 import org.educa.homelyBackend.entity.Users;
@@ -38,7 +39,12 @@ public class LoginController extends BaseController {
         Users user;
 
         if (searchedUser.isEmpty()) {
-            Optional<Users> nuevoUsuario = usersService.processNewUser(name, email, null);
+            Optional<Users> nuevoUsuario;
+            try {
+                nuevoUsuario = usersService.processNewUser(name, email, null);
+            } catch (ResendException e) {
+                return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
+            }
 
             if (nuevoUsuario.isEmpty())
                 return badRequestCustomized("No se pudo crear el usuario porque no se encontró el rol o el status especificados");
@@ -98,7 +104,12 @@ public class LoginController extends BaseController {
 
         if (searchedUser.isPresent()) return badRequestCustomized("Ya existe un usuario con ese email");
 
-        Optional<Users> nuevoUsuario = usersService.processNewUser(name, email, password);
+        Optional<Users> nuevoUsuario;
+        try {
+            nuevoUsuario = usersService.processNewUser(name, email, password);
+        } catch (ResendException e) {
+            return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
+        }
 
         if (nuevoUsuario.isEmpty())
             return badRequestCustomized("No se pudo crear el usuario porque no se encontró el rol o el status especificados");
