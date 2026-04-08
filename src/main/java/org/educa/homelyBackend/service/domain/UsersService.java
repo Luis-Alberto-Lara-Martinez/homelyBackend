@@ -53,14 +53,22 @@ public class UsersService {
         newUser.setImageUrl("https://res.cloudinary.com/homely-cloudinary/image/upload/v1767874172/perfil.png");
         newUser.setName(name);
         newUser.setEmail(email);
-        if (password != null && !password.isBlank()) newUser.setHashPassword(passwordEncoder.encode(password));
+        if (password != null && !password.isBlank()) newUser.setHashPassword(encodePassword(password));
 
-        usersRepository.save(newUser);
+        saveUser(newUser);
         emailService.sendWelcomeEmail(email, name);
         return Optional.of(newUser);
     }
 
+    public void saveUser(Users user) {
+        usersRepository.save(user);
+    }
+
     public boolean checkPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 }
