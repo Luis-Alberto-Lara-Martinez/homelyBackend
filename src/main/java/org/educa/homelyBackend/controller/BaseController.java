@@ -11,4 +11,10 @@ public abstract class BaseController {
                 "error", errorMessage
         ));
     }
+
+    protected ResponseEntity<Map<String, String>> okRequestCustomized(String message) {
+        return ResponseEntity.ok(Map.of(
+                "message", message
+        ));
+    }
 }
