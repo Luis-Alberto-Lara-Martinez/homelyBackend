@@ -1,6 +1,7 @@
 package org.educa.homelyBackend.controller;
 
 import com.resend.core.exception.ResendException;
+import jakarta.validation.Valid;
 import org.educa.homelyBackend.dto.LoginTraditionalRequest;
 import org.educa.homelyBackend.dto.RegisterTraditionalRequest;
 import org.educa.homelyBackend.entity.Users;
@@ -58,14 +59,9 @@ public class LoginController extends BaseController {
     }
 
     @PostMapping("/local/login")
-    public ResponseEntity<Map<String, String>> loginTraditional(@RequestBody LoginTraditionalRequest request) {
-        String email = request.email();
+    public ResponseEntity<Map<String, String>> loginTraditional(@Valid @RequestBody LoginTraditionalRequest request) {
+        String email = request.email().toLowerCase();
         String password = request.password();
-
-        if (email == null || email.isBlank()) return badRequestCustomized("El email es requerido");
-        if (password == null || password.isBlank()) return badRequestCustomized("La password es requerida");
-
-        email = email.toLowerCase().trim();
 
         Optional<Users> searchedUser = usersService.findByEmail(email);
 
@@ -83,22 +79,14 @@ public class LoginController extends BaseController {
     }
 
     @PostMapping("/local/register")
-    public ResponseEntity<Map<String, String>> registerTraditional(@RequestBody RegisterTraditionalRequest request) {
-        String name = request.name();
-        String email = request.email();
+    public ResponseEntity<Map<String, String>> registerTraditional(@Valid @RequestBody RegisterTraditionalRequest request) {
+        String name = request.name().trim();
+        String email = request.email().toLowerCase();
         String password = request.password();
         String confirmedPassword = request.confirmedPassword();
 
-        if (name == null || name.isBlank()) return badRequestCustomized("El name es requerido");
-        if (email == null || email.isBlank()) return badRequestCustomized("El email es requerido");
-        if (password == null || password.isBlank()) return badRequestCustomized("La password es requerida");
-        if (confirmedPassword == null || confirmedPassword.isBlank())
-            return badRequestCustomized("La confirmedPassword es requerida");
         if (!password.equals(confirmedPassword))
             return badRequestCustomized("La password y la confirmedPassword no coinciden");
-
-        name = name.trim();
-        email = email.toLowerCase().trim();
 
         Optional<Users> searchedUser = usersService.findByEmail(email);
 

@@ -3,15 +3,15 @@ package org.educa.homelyBackend.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public record RegisterTraditionalRequest(
-        @NotBlank(message = "El name es requerido")
-        String name,
+public record ResetUserPasswordRequest(
+        @NotBlank(message = "El token es requerido")
+        String token,
 
         @NotBlank(message = "El email es requerido")
         @Email(message = "Formato de email inválido")
         String email,
 
-        @NotBlank(message = "La password es requerida")
+        @NotBlank(message = "La password es requerido")
         String password,
 
         @NotBlank(message = "La confirmedPassword es requerida")
