@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ResetPasswordTokensService {
@@ -24,12 +25,14 @@ public class ResetPasswordTokensService {
     private final ResetTokenService resetTokenService;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final UsersService usersService;
 
-    public ResetPasswordTokensService(ResetPasswordTokensRepository resetPasswordTokensRepository, ResetTokenService resetTokenService, EmailService emailService, PasswordEncoder passwordEncoder) {
+    public ResetPasswordTokensService(ResetPasswordTokensRepository resetPasswordTokensRepository, ResetTokenService resetTokenService, EmailService emailService, PasswordEncoder passwordEncoder, UsersService usersService) {
         this.resetPasswordTokensRepository = resetPasswordTokensRepository;
         this.resetTokenService = resetTokenService;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.usersService = usersService;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -53,8 +56,33 @@ public class ResetPasswordTokensService {
         );
     }
 
-    public List<ResetPasswordTokens> findByUser(Users user) {
-        return resetPasswordTokensRepository.findByIdUser(user);
+    @Transactional(rollbackFor = Exception.class)
+    public boolean processNewResetPasswordTokensJustUsed(Users user, String password, String token) {
+        List<ResetPasswordTokens> resetPasswordTokensList = findByUserOrderByCreatedAtDesc(user);
+
+        if (resetPasswordTokensList.isEmpty())
+            return false;
+
+        for (ResetPasswordTokens resetPasswordToken : resetPasswordTokensList) {
+            if (checkToken(token, resetPasswordToken.getHashToken())) {
+                resetPasswordToken.setUsed(true);
+                saveResetPasswordTokens(resetPasswordToken);
+
+                user.setHashPassword(passwordEncoder.encode(password));
+                usersService.saveUser(user);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Optional<ResetPasswordTokens> findFirstByUserOrderByCreatedAtDesc(Users user) {
+        return resetPasswordTokensRepository.findFirstByIdUserOrderByCreatedAtDesc(user);
+    }
+
+    public List<ResetPasswordTokens> findByUserOrderByCreatedAtDesc(Users user) {
+        return resetPasswordTokensRepository.findByIdUserOrderByCreatedAtDesc(user);
     }
 
     public void saveResetPasswordTokens(ResetPasswordTokens resetPasswordToken) {
