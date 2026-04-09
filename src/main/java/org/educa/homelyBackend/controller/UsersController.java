@@ -71,9 +71,13 @@ public class UsersController extends BaseController {
             makeChanges = true;
         }
 
-        if (password != null && password.equals(confirmedPassword)) {
-            user.setHashPassword(usersService.encodePassword(password));
-            makeChanges = true;
+        if (password != null) {
+            if (password.equals(confirmedPassword)) {
+                user.setHashPassword(usersService.encodePassword(password));
+                makeChanges = true;
+            } else {
+                return badRequestCustomized("Las contraseñas no coinciden");
+            }
         }
 
         if (rawImage != null && !rawImage.isEmpty()) {
@@ -87,8 +91,11 @@ public class UsersController extends BaseController {
             makeChanges = true;
         }
 
-        if (makeChanges) usersService.saveUser(user);
-
-        return okRequestCustomized("Datos personales actualizados correctamente");
+        if (makeChanges) {
+            usersService.saveUser(user);
+            return okRequestCustomized("Datos personales actualizados correctamente");
+        } else {
+            return okRequestCustomized("No se encontró ningún dato nuevo para actualizar");
+        }
     }
 }
