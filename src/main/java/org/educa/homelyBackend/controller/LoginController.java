@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,6 +46,8 @@ public class LoginController extends BaseController {
                 nuevoUsuario = usersService.processNewUser(name, email, null);
             } catch (ResendException e) {
                 return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
+            } catch (IOException e) {
+                return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al generar el avatar");
             }
 
             if (nuevoUsuario.isEmpty())
@@ -97,6 +100,8 @@ public class LoginController extends BaseController {
             nuevoUsuario = usersService.processNewUser(name, email, password);
         } catch (ResendException e) {
             return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
+        } catch (IOException e) {
+            return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al generar el avatar");
         }
 
         if (nuevoUsuario.isEmpty())

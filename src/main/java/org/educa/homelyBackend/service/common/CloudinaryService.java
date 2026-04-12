@@ -22,4 +22,11 @@ public class CloudinaryService {
                 .get("secure_url")
                 .toString();
     }
+
+    public String uploadFile(byte[] rawFileBytes) throws IOException {
+        return cloudinary.uploader()
+                .upload(rawFileBytes, Map.of("folder", "homely"))
+                .get("secure_url")
+                .toString();
+    }
 }
