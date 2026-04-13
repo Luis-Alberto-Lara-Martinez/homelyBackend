@@ -53,7 +53,7 @@ public class UsersService {
         if (userRol.isEmpty()) return Optional.empty();
         if (userStatus.isEmpty()) return Optional.empty();
 
-        String newImageUrl = cloudinaryService.uploadFile(avatarService.generateAvatar(name));
+        String newImageUrl = cloudinaryService.uploadFile(avatarService.generateAvatar(name), email);
 
         Users newUser = new Users();
 

@@ -2,16 +2,18 @@ package org.educa.homelyBackend.service.common;
 
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @Service
 public class AvatarService {
 
     private static final Integer AVATAR_SIZE = 500;
 
-    public byte[] generateAvatar(String name) {
+    public byte[] generateAvatar(String name) throws IOException {
         String initials = obtainInitials(name);
 
         BufferedImage avatarImage = new BufferedImage(AVATAR_SIZE, AVATAR_SIZE, BufferedImage.TYPE_INT_ARGB);
@@ -45,6 +47,7 @@ public class AvatarService {
         graphics.dispose();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(avatarImage, "png", baos);
         return baos.toByteArray();
     }
 

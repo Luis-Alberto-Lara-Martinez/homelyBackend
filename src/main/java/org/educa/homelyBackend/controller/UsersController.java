@@ -87,7 +87,7 @@ public class UsersController extends BaseController {
         if (rawImage != null && !rawImage.isEmpty()) {
             String newImageUrl;
             try {
-                newImageUrl = cloudinaryService.uploadFile(rawImage);
+                newImageUrl = cloudinaryService.uploadFile(rawImage, user.getEmail());
             } catch (IOException e) {
                 return badRequestCustomized("Error al subir la imagen a Cloudinary");
             }
