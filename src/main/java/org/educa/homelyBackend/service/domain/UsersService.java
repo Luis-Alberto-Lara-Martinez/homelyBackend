@@ -50,22 +50,24 @@ public class UsersService {
         Optional<UserRoles> userRol = userRolesService.findByName("USER");
         Optional<UserStatuses> userStatus = userStatusesService.findByName("ACTIVE");
 
-        if (userRol.isEmpty()) return Optional.empty();
-        if (userStatus.isEmpty()) return Optional.empty();
-
-        String newImageUrl = cloudinaryService.uploadFile(avatarService.generateAvatar(name), email);
+        if (userRol.isEmpty() || userStatus.isEmpty()) return Optional.empty();
 
         Users newUser = new Users();
-
         newUser.setIdRole(userRol.get());
         newUser.setIdStatus(userStatus.get());
-        newUser.setImageUrl(newImageUrl);
         newUser.setName(name);
         newUser.setEmail(email);
         if (password != null && !password.isBlank()) newUser.setHashPassword(encodePassword(password));
 
-        saveUser(newUser);
+        newUser = usersRepository.save(newUser);
+
+        String newImageUrl = cloudinaryService.uploadAvatarImage(avatarService.generateAvatar(name), newUser.getId());
+        newUser.setImageUrl(newImageUrl);
+
+        newUser = usersRepository.save(newUser);
+
         emailService.sendWelcomeEmail(email, name);
+
         return Optional.of(newUser);
     }
 

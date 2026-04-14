@@ -55,7 +55,7 @@ public class UsersController extends BaseController {
     @PutMapping("/api/datos-personales/actualizar")
     public ResponseEntity<Map<String, String>> updatePersonalUserData(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestPart(value = "rawImage", required = false) MultipartFile rawImage,
+            @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile,
             @RequestPart(value = "name", required = false) String name,
             @RequestPart(value = "password", required = false) String password,
             @RequestPart(value = "confirmedPassword", required = false) String confirmedPassword
@@ -84,10 +84,10 @@ public class UsersController extends BaseController {
             }
         }
 
-        if (rawImage != null && !rawImage.isEmpty()) {
+        if (avatarFile != null && !avatarFile.isEmpty()) {
             String newImageUrl;
             try {
-                newImageUrl = cloudinaryService.uploadFile(rawImage, user.getEmail());
+                newImageUrl = cloudinaryService.uploadAvatarImage(avatarFile, user.getId());
             } catch (IOException e) {
                 return badRequestCustomized("Error al subir la imagen a Cloudinary");
             }
