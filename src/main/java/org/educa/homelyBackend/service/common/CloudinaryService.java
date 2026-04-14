@@ -5,11 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class CloudinaryService {
+
+    private static final String BASE_DIRECTORY = "homely";
 
     private final Cloudinary cloudinary;
 
@@ -17,28 +18,59 @@ public class CloudinaryService {
         this.cloudinary = cloudinary;
     }
 
-    public String uploadFile(MultipartFile file, String email) throws IOException {
-        return uploadFile(file.getBytes(), email);
+    public String uploadAvatarImage(MultipartFile avatarImageFile, Integer userId) throws IOException {
+        return uploadAvatarImage(avatarImageFile.getBytes(), userId);
     }
 
-    public String uploadFile(byte[] rawFileBytes, String email) throws IOException {
-        Map<String, Object> uploadOptions = new HashMap<>();
-        uploadOptions.put("folder", "homely");
+    public String uploadAvatarImage(byte[] rawAvatarImage, Integer userId) throws IOException {
+        String subfolder = "avatars";
+        String fileName = String.valueOf(userId);
 
-        if (email != null && !email.isBlank()) uploadOptions.put("public_id", email);
+        return uploadImage(rawAvatarImage, buildUploadOptions(subfolder, fileName));
+    }
 
+    public String uploadPropertyImage(MultipartFile propertyImageFile, Integer propertyId, Integer propertyImageOrder) throws IOException {
+        return uploadPropertyImage(propertyImageFile.getBytes(), propertyId, propertyImageOrder);
+    }
+
+    public String uploadPropertyImage(byte[] rawPropertyImage, Integer propertyId, Integer propertyImageOrder) throws IOException {
+        String subfolder = "properties";
+        String fileName = propertyId + "-" + propertyImageOrder;
+
+        return uploadImage(rawPropertyImage, buildUploadOptions(subfolder, fileName));
+    }
+
+    public void deleteAvatarImage(Integer userId) throws IOException {
+        String publicId = BASE_DIRECTORY + "/avatars/" + userId;
+        deleteImage(publicId, buildDeleteOptions());
+    }
+
+    public void deletePropertyImage(Integer propertyId, Integer propertyImageOrder) throws IOException {
+        String publicId = BASE_DIRECTORY + "/properties/" + propertyId + "-" + propertyImageOrder;
+        deleteImage(publicId, buildDeleteOptions());
+    }
+
+    private String uploadImage(byte[] rawImage, Map<String, String> uploadOptions) throws IOException {
         return cloudinary.uploader()
-                .upload(rawFileBytes, uploadOptions)
+                .upload(rawImage, uploadOptions)
                 .get("secure_url")
                 .toString();
     }
 
-    public void deleteFile(String email) throws IOException {
-        String publicId = "homely/" + email;
+    private Map<String, String> buildUploadOptions(String subFolder, String fileName) {
+        return Map.of(
+                "folder", BASE_DIRECTORY + "/" + subFolder,
+                "public_id", fileName
+        );
+    }
 
-        Map<String, Object> uploadOptions = new HashMap<>();
-        uploadOptions.put("invalidate", true);
+    private void deleteImage(String publicId, Map<String, Object> deleteOptions) throws IOException {
+        cloudinary.uploader().destroy(publicId, deleteOptions);
+    }
 
-        cloudinary.uploader().destroy(publicId, uploadOptions);
+    private Map<String, Object> buildDeleteOptions() {
+        return Map.of(
+                "invalidate", true
+        );
     }
 }
