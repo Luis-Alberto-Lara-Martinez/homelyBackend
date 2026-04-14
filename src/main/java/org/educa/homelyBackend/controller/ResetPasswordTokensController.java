@@ -2,19 +2,16 @@ package org.educa.homelyBackend.controller;
 
 import com.resend.core.exception.ResendException;
 import jakarta.validation.Valid;
-import org.educa.homelyBackend.dto.CheckResetTokenRequest;
-import org.educa.homelyBackend.dto.ForgetUserPasswordRequest;
-import org.educa.homelyBackend.dto.ResetUserPasswordRequest;
+import org.educa.homelyBackend.dto.*;
 import org.educa.homelyBackend.entity.ResetPasswordTokens;
 import org.educa.homelyBackend.entity.Users;
-import org.educa.homelyBackend.service.common.CloudinaryService;
+import org.educa.homelyBackend.service.common.JwtService;
 import org.educa.homelyBackend.service.domain.ResetPasswordTokensService;
 import org.educa.homelyBackend.service.domain.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -23,84 +20,17 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-public class UsersController extends BaseController {
+@RequestMapping("/api")
+public class ResetPasswordTokensController extends BaseController {
+
+    // TODO: revisar archivo entero
 
     private final UsersService usersService;
-    private final CloudinaryService cloudinaryService;
     private final ResetPasswordTokensService resetPasswordTokensService;
 
-    public UsersController(UsersService usersService, CloudinaryService cloudinaryService, ResetPasswordTokensService resetPasswordTokensService) {
+    public ResetPasswordTokensController(UsersService usersService, ResetPasswordTokensService resetPasswordTokensService) {
         this.usersService = usersService;
-        this.cloudinaryService = cloudinaryService;
         this.resetPasswordTokensService = resetPasswordTokensService;
-    }
-
-    @GetMapping("/api/datos-personales/obtener")
-    public ResponseEntity<?> getPersonalUserData(@AuthenticationPrincipal Jwt jwt) {
-        String email = jwt.getSubject();
-
-        Optional<Users> userLooked = usersService.findByEmail(email);
-
-        if (userLooked.isEmpty())
-            return badRequestCustomized("No se ha encontrado ningún usuario con el email proporcionado");
-
-        Users user = userLooked.get();
-
-        return ResponseEntity.ok(Map.of(
-                "name", user.getName(),
-                "imageUrl", user.getImageUrl()
-        ));
-    }
-
-    @PutMapping("/api/datos-personales/actualizar")
-    public ResponseEntity<Map<String, String>> updatePersonalUserData(
-            @AuthenticationPrincipal Jwt jwt,
-            @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile,
-            @RequestPart(value = "name", required = false) String name,
-            @RequestPart(value = "password", required = false) String password,
-            @RequestPart(value = "confirmedPassword", required = false) String confirmedPassword
-    ) {
-        boolean makeChanges = false;
-        String email = jwt.getSubject();
-
-        Optional<Users> userLooked = usersService.findByEmail(email);
-
-        if (userLooked.isEmpty())
-            return badRequestCustomized("No se ha encontrado ningún usuario con el email proporcionado");
-
-        Users user = userLooked.get();
-
-        if (name != null && !name.trim().equals(user.getName())) {
-            user.setName(name.trim());
-            makeChanges = true;
-        }
-
-        if (password != null) {
-            if (password.equals(confirmedPassword)) {
-                user.setHashPassword(usersService.encodePassword(password));
-                makeChanges = true;
-            } else {
-                return badRequestCustomized("Las contraseñas no coinciden");
-            }
-        }
-
-        if (avatarFile != null && !avatarFile.isEmpty()) {
-            String newImageUrl;
-            try {
-                newImageUrl = cloudinaryService.uploadAvatarImage(avatarFile, user.getId());
-            } catch (IOException e) {
-                return badRequestCustomized("Error al subir la imagen a Cloudinary");
-            }
-            user.setImageUrl(newImageUrl);
-            makeChanges = true;
-        }
-
-        if (makeChanges) {
-            usersService.saveUser(user);
-            return okRequestCustomized("Datos personales actualizados correctamente");
-        } else {
-            return okRequestCustomized("No se encontró ningún dato nuevo para actualizar");
-        }
     }
 
     @PostMapping("/olvidar-contrasena")
