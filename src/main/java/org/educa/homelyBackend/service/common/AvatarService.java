@@ -12,6 +12,7 @@ import java.io.IOException;
 public class AvatarService {
 
     private static final Integer AVATAR_SIZE = 500;
+    private static final String FONT_NAME = "Arial";
 
     public byte[] generateAvatar(String name) throws IOException {
         String initials = obtainInitials(name);
@@ -19,47 +20,47 @@ public class AvatarService {
         BufferedImage avatarImage = new BufferedImage(AVATAR_SIZE, AVATAR_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = avatarImage.createGraphics();
 
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        try {
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        Color backgroundColor = generateRandomColor();
-        graphics.setColor(backgroundColor);
-        graphics.fillOval(0, 0, AVATAR_SIZE, AVATAR_SIZE);
+            Color backgroundColor = generateRandomColor();
+            graphics.setColor(backgroundColor);
+            graphics.fillOval(0, 0, AVATAR_SIZE, AVATAR_SIZE);
 
-        Color textColor = getTextColorBasedOnBackground(backgroundColor);
-        graphics.setColor(textColor);
+            graphics.setColor(getTextColorBasedOnBackground(backgroundColor));
+            setupOptimalFont(graphics, initials);
 
-        int fontSize = AVATAR_SIZE / 2;
-        Font font = new Font("Arial", Font.BOLD, fontSize);
-        graphics.setFont(font);
+            FontMetrics fm = graphics.getFontMetrics();
+            int x = (AVATAR_SIZE - fm.stringWidth(initials)) / 2;
+            int y = (AVATAR_SIZE - fm.getHeight()) / 2 + fm.getAscent();
 
-        FontMetrics fm = graphics.getFontMetrics();
-        while (fm.stringWidth(initials) > AVATAR_SIZE * 0.8) {
-            fontSize--;
-            font = new Font("Arial", Font.BOLD, fontSize);
-            graphics.setFont(font);
-            fm = graphics.getFontMetrics();
+            graphics.drawString(initials, x, y);
+        } finally {
+            graphics.dispose();
         }
 
-        int x = (AVATAR_SIZE - fm.stringWidth(initials)) / 2;
-        int y = (AVATAR_SIZE - fm.getHeight()) / 2 + fm.getAscent();
-
-        graphics.drawString(initials, x, y);
-        graphics.dispose();
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(avatarImage, "png", baos);
-        return baos.toByteArray();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ImageIO.write(avatarImage, "png", baos);
+            return baos.toByteArray();
+        }
     }
 
     private String obtainInitials(String name) {
-        String[] parts = name.trim().split("\\s+");
+        if (name == null || name.isBlank()) {
+            return "??";
+        }
+
+        String[] nameParts = name.trim().split("\\s+");
         StringBuilder sb = new StringBuilder();
-        for (String part : parts) {
-            if (!part.isBlank()) {
-                sb.append(Character.toUpperCase(part.charAt(0)));
+
+        for (int i = 0; i < Math.min(nameParts.length, 2); i++) {
+            if (!nameParts[i].isBlank()) {
+                sb.append(Character.toUpperCase(nameParts[i].charAt(0)));
             }
         }
-        return sb.toString().toUpperCase();
+
+        return sb.toString();
     }
 
     private Color generateRandomColor() {
@@ -70,11 +71,22 @@ public class AvatarService {
     }
 
     private Color getTextColorBasedOnBackground(Color backgroundColor) {
-        double brightness = ((backgroundColor.getRed() * 0.299) +
-                (backgroundColor.getGreen() * 0.587) +
-                (backgroundColor.getBlue() * 0.114));
+        double brightness = (backgroundColor.getRed() * 0.299 +
+                backgroundColor.getGreen() * 0.587 +
+                backgroundColor.getBlue() * 0.114);
         return brightness > 150
                 ? Color.BLACK
                 : Color.WHITE;
+    }
+
+    private void setupOptimalFont(Graphics2D graphics, String initials) {
+        int fontSize = AVATAR_SIZE / 2;
+        graphics.setFont(new Font(FONT_NAME, Font.BOLD, fontSize));
+        FontMetrics fm = graphics.getFontMetrics();
+
+        if (fm.stringWidth(initials) > AVATAR_SIZE * 0.8) {
+            fontSize = (int) (fontSize * (AVATAR_SIZE * 0.8 / fm.stringWidth(initials)));
+            graphics.setFont(new Font(FONT_NAME, Font.BOLD, fontSize));
+        }
     }
 }
