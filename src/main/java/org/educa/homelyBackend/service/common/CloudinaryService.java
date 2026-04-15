@@ -1,13 +1,16 @@
 package org.educa.homelyBackend.service.common;
 
 import com.cloudinary.Cloudinary;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
 
 @Service
+@Validated
 public class CloudinaryService {
 
     private static final String BASE_DIRECTORY = "homely";
@@ -18,7 +21,12 @@ public class CloudinaryService {
         this.cloudinary = cloudinary;
     }
 
-    public String uploadAvatarImage(MultipartFile avatarImageFile, Integer userId) throws IOException {
+    public String uploadAvatarImage(
+            @NotNull(message = "La imagen de avatar es null")
+            MultipartFile avatarImageFile,
+
+            @NotNull(message = "El ID de usuario es null")
+            Integer userId) throws IOException {
         return uploadAvatarImage(avatarImageFile.getBytes(), userId);
     }
 

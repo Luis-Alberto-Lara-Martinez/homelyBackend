@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import org.educa.homelyBackend.dto.LoginTraditionalRequest;
 import org.educa.homelyBackend.dto.RegisterTraditionalRequest;
 import org.educa.homelyBackend.entity.Users;
-import org.educa.homelyBackend.service.common.JwtService;
+import org.educa.homelyBackend.service.common.TokenService;
 import org.educa.homelyBackend.service.domain.UsersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,9 +22,9 @@ import java.util.Optional;
 public class LoginController extends BaseController {
 
     private final UsersService usersService;
-    private final JwtService jwtService;
+    private final TokenService jwtService;
 
-    public LoginController(UsersService usersService, JwtService jwtService) {
+    public LoginController(UsersService usersService, TokenService jwtService) {
         this.usersService = usersService;
         this.jwtService = jwtService;
     }
@@ -43,7 +43,7 @@ public class LoginController extends BaseController {
         if (searchedUser.isEmpty()) {
             Optional<Users> nuevoUsuario;
             try {
-                nuevoUsuario = usersService.processNewUser(name, email, null);
+                nuevoUsuario = usersService.getUserOrCreateNewUser(name, email, null);
             } catch (ResendException e) {
                 return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
             } catch (IOException e) {
@@ -97,7 +97,7 @@ public class LoginController extends BaseController {
 
         Optional<Users> nuevoUsuario;
         try {
-            nuevoUsuario = usersService.processNewUser(name, email, password);
+            nuevoUsuario = usersService.getUserOrCreateNewUser(name, email, password);
         } catch (ResendException e) {
             return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
         } catch (IOException e) {
@@ -113,7 +113,7 @@ public class LoginController extends BaseController {
     }
 
     private ResponseEntity<Map<String, String>> createLoginResponse(Users user) {
-        String token = jwtService.generateToken(user.getEmail(), Map.of(
+        String token = jwtService.generatePersonalizedJwt(user.getEmail(), Map.of(
                 "name", user.getName(),
                 "role", user.getIdRole().getName()
         ));

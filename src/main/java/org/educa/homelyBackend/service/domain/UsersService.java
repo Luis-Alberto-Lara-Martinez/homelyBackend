@@ -1,6 +1,9 @@
 package org.educa.homelyBackend.service.domain;
 
 import com.resend.core.exception.ResendException;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.educa.homelyBackend.entity.UserRoles;
 import org.educa.homelyBackend.entity.UserStatuses;
 import org.educa.homelyBackend.entity.Users;
@@ -8,26 +11,28 @@ import org.educa.homelyBackend.repository.UsersRepository;
 import org.educa.homelyBackend.service.common.AvatarService;
 import org.educa.homelyBackend.service.common.CloudinaryService;
 import org.educa.homelyBackend.service.common.EmailService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.educa.homelyBackend.service.common.PasswordEncoderService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Validated
 public class UsersService {
 
     private final UsersRepository usersRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoderService passwordEncoder;
     private final UserRolesService userRolesService;
     private final UserStatusesService userStatusesService;
     private final EmailService emailService;
     private final CloudinaryService cloudinaryService;
     private final AvatarService avatarService;
 
-    public UsersService(UsersRepository usersRepository, PasswordEncoder passwordEncoder, UserRolesService userRolesService, UserStatusesService userStatusesService, EmailService emailService, CloudinaryService cloudinaryService, AvatarService avatarService) {
+    public UsersService(UsersRepository usersRepository, PasswordEncoderService passwordEncoder, UserRolesService userRolesService, UserStatusesService userStatusesService, EmailService emailService, CloudinaryService cloudinaryService, AvatarService avatarService) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRolesService = userRolesService;
@@ -41,12 +46,40 @@ public class UsersService {
         return usersRepository.findAll();
     }
 
-    public Optional<Users> findByEmail(String email) {
+    public Optional<Users> findByEmail(
+            @NotBlank(message = "El email no puede estar vacío")
+            @Email(message = "Formato de email inválido")
+            String email
+    ) {
         return usersRepository.findByEmail(email);
     }
 
+    public void saveUser(@NotNull Users user) {
+        usersRepository.save(user);
+    }
+
     @Transactional(rollbackFor = Exception.class)
-    public Optional<Users> processNewUser(String name, String email, String password) throws ResendException, IOException {
+    public Optional<Users> getUserOrCreateNewUser(
+            @NotBlank(message = "El nombre no puede estar vacío")
+            String name,
+
+            @NotBlank(message = "El email no puede estar vacío")
+            @Email(message = "Formato de email inválido")
+            String email,
+
+            String password
+    ) throws ResendException, IOException {
+        Optional<Users> userSearched = findByEmail(email);
+
+        if (userSearched.isEmpty()) {
+            emailService.sendWelcomeEmail(email, name);
+            return createNewUser(name, email, password);
+        } else {
+            return userSearched;
+        }
+    }
+
+    private Optional<Users> createNewUser(String name, String email, String password) throws IOException {
         Optional<UserRoles> userRol = userRolesService.findByName("USER");
         Optional<UserStatuses> userStatus = userStatusesService.findByName("ACTIVE");
 
@@ -57,29 +90,13 @@ public class UsersService {
         newUser.setIdStatus(userStatus.get());
         newUser.setName(name);
         newUser.setEmail(email);
-        if (password != null && !password.isBlank()) newUser.setHashPassword(encodePassword(password));
+        if (password != null && !password.isBlank()) newUser.setHashPassword(passwordEncoder.generateHash(password));
 
         newUser = usersRepository.save(newUser);
 
         String newImageUrl = cloudinaryService.uploadAvatarImage(avatarService.generateAvatar(name), newUser.getId());
         newUser.setImageUrl(newImageUrl);
 
-        newUser = usersRepository.save(newUser);
-
-        emailService.sendWelcomeEmail(email, name);
-
-        return Optional.of(newUser);
-    }
-
-    public void saveUser(Users user) {
-        usersRepository.save(user);
-    }
-
-    public boolean checkPassword(String rawPassword, String encodedPassword) {
-        return passwordEncoder.matches(rawPassword, encodedPassword);
-    }
-
-    public String encodePassword(String rawPassword) {
-        return passwordEncoder.encode(rawPassword);
+        return Optional.of(usersRepository.save(newUser));
     }
 }

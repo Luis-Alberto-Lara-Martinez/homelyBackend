@@ -2,18 +2,16 @@ package org.educa.homelyBackend.controller;
 
 import com.resend.core.exception.ResendException;
 import jakarta.validation.Valid;
-import org.educa.homelyBackend.dto.*;
+import org.educa.homelyBackend.dto.CheckResetTokenRequest;
+import org.educa.homelyBackend.dto.ForgetUserPasswordRequest;
+import org.educa.homelyBackend.dto.ResetUserPasswordRequest;
 import org.educa.homelyBackend.entity.ResetPasswordTokens;
 import org.educa.homelyBackend.entity.Users;
-import org.educa.homelyBackend.service.common.JwtService;
 import org.educa.homelyBackend.service.domain.ResetPasswordTokensService;
 import org.educa.homelyBackend.service.domain.UsersService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;

@@ -1,6 +1,8 @@
 package org.educa.homelyBackend.service.common;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -9,12 +11,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @Service
+@Validated
 public class AvatarService {
 
     private static final Integer AVATAR_SIZE = 500;
     private static final String FONT_NAME = "Arial";
 
-    public byte[] generateAvatar(String name) throws IOException {
+    public byte[] generateAvatar(@NotBlank String name) throws IOException {
         String initials = obtainInitials(name);
 
         BufferedImage avatarImage = new BufferedImage(AVATAR_SIZE, AVATAR_SIZE, BufferedImage.TYPE_INT_ARGB);
