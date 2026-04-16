@@ -25,7 +25,7 @@ public class GlobalExceptionHandler extends BaseController {
                 .stream()
                 .map(ConstraintViolation::getMessage)
                 .findFirst()
-                .orElse("Error inesperado de validación");
+                .orElse("Error inesperado por violación en la excepción");
         return badRequestCustomized(errorMessage);
     }
 }

@@ -3,6 +3,7 @@ package org.educa.homelyBackend.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -39,22 +40,17 @@ class SecurityConfiguration {
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:4200",
                 "https://homelyweb.app",
-                "https://www.homelyweb.app"));
+                "https://www.homelyweb.app"
+        ));
         configuration.setAllowedMethods(List.of(
                 "GET",
                 "POST",
                 "PUT",
                 "DELETE",
                 "PATCH",
-                "OPTIONS"));
-        configuration.setAllowedHeaders(List.of(
-                "Authorization",
-                "Content-Type",
-                "X-Requested-With",
-                "Accept",
-                "Origin",
-                "Access-Control-Request-Method",
-                "Access-Control-Request-Headers"));
+                "OPTIONS"
+        ));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -66,72 +62,53 @@ class SecurityConfiguration {
     @Bean
     @Order(1)
     public SecurityFilterChain oauth2Chain(HttpSecurity http) {
-        JwtIssuerAuthenticationManagerResolver jwtIssuerAuthenticationManagerResolver =
+        JwtIssuerAuthenticationManagerResolver authenticationManagerResolver =
                 JwtIssuerAuthenticationManagerResolver.fromTrustedIssuers(
                         "https://accounts.google.com",
-                        "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0");
-        http
+                        "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0"
+                );
+
+        return generateCommonSettings(http)
                 .securityMatcher("/oauth2/**")
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated())
+                        .anyRequest().authenticated()
+                )
                 .oauth2ResourceServer(oauth -> oauth
-                        .authenticationManagerResolver(jwtIssuerAuthenticationManagerResolver))
-                .httpBasic(AbstractHttpConfigurer::disable);
-        return http.build();
+                        .authenticationManagerResolver(authenticationManagerResolver))
+                .build();
     }
 
     @Bean
     @Order(2)
-    public SecurityFilterChain adminChain(HttpSecurity http) {
-        http
-                .securityMatcher("/admin/**")
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource()))
+    public SecurityFilterChain apiChain(HttpSecurity http) {
+        return generateCommonSettings(http)
+                .securityMatcher("/admin/**", "/api/**")
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().hasRole("ADMIN"))
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(AbstractHttpConfigurer::disable);
-        return http.build();
+                .build();
     }
 
     @Bean
     @Order(3)
-    public SecurityFilterChain apiChain(HttpSecurity http) {
-        http
-                .securityMatcher("/api/**")
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource()))
+    public SecurityFilterChain defaultChain(HttpSecurity http) {
+        return generateCommonSettings(http)
+                .securityMatcher("/**")
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(AbstractHttpConfigurer::disable);
-        return http.build();
+                        .anyRequest().permitAll()
+                )
+                .build();
     }
 
-    @Bean
-    @Order(4)
-    public SecurityFilterChain defaultChain(HttpSecurity http) {
-        http
-                .securityMatcher("/**")
+    private HttpSecurity generateCommonSettings(HttpSecurity http) {
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll())
-                .httpBasic(AbstractHttpConfigurer::disable);
-        return http.build();
+                .cors(Customizer.withDefaults())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable);
     }
 }
