@@ -9,6 +9,7 @@ import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.common.EmailService;
 import org.educa.homelyBackend.services.common.TokenService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -37,11 +38,13 @@ public class ResetTokenService {
     }
 
 
-    public Optional<ResetTokenModel> findByHashedToken(
+    public ResetTokenModel findByHashedToken(
             @NotBlank(message = "User cannot be null nor empty")
             String token
     ) {
-        return resetTokenDao.findByHashedToken(tokenService.generateHashToken(token)).orElseThrow();
+        return resetTokenDao
+                .findByHashedToken(tokenService.generateHashToken(token))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No reset token found for the provided token"));
     }
 
     public ResetTokenModel saveOrUpdate(ResetTokenModel resetTokenModel) {
@@ -78,7 +81,9 @@ public class ResetTokenService {
         Optional<ResetTokenModel> optionalResetTokenModel = findByHashedToken(token);
 
         if (optionalResetTokenModel.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No reset token found for the provided token");
+            ResponseEntity<> ()
+            responseEntity = ResponseEntity.status(HttpStatus.NOT_FOUND).body("No reset token found for the provided token");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No reset token found for the provided token");
         }
 
 
