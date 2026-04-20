@@ -1,9 +1,12 @@
 package org.educa.homelyBackend.services.common;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -12,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Validated
 public class IaService {
 
     private final WebClient webClient;
@@ -30,7 +34,10 @@ public class IaService {
                 .build();
     }
 
-    public String chat(String prompt) {
+    public String chat(
+            @NotBlank(message = "The prompt cannot be null nor empty")
+            String prompt
+    ) {
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, Object> requestBody = new HashMap<>();

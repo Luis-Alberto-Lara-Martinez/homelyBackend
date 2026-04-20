@@ -17,7 +17,10 @@ public class AvatarService {
     private static final Integer AVATAR_SIZE = 500;
     private static final String FONT_NAME = "Arial";
 
-    public byte[] generateAvatar(@NotBlank String name) throws IOException {
+    public byte[] generateAvatar(
+            @NotBlank(message = "The name used to generate the avatar is null or empty")
+            String name
+    ) throws IOException {
         String initials = obtainInitials(name);
 
         BufferedImage avatarImage = new BufferedImage(AVATAR_SIZE, AVATAR_SIZE, BufferedImage.TYPE_INT_ARGB);

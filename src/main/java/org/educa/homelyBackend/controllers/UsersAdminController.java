@@ -1,6 +1,6 @@
 package org.educa.homelyBackend.controllers;
 
-import org.educa.homelyBackend.services.dedicated.UsersService;
+import org.educa.homelyBackend.services.dedicated.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,10 +14,10 @@ public class UsersAdminController extends BaseController {
 
     // TODO: hacer archivo entero
 
-    private final UsersService usersService;
+    private final UserService userService;
 
-    public UsersAdminController(UsersService usersService) {
-        this.usersService = usersService;
+    public UsersAdminController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/users")

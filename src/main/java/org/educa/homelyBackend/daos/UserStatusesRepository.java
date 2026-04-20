@@ -1,11 +1,12 @@
 package org.educa.homelyBackend.daos;
 
+import org.educa.homelyBackend.models.UserStatusModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserStatusesRepository extends JpaRepository<UserStatuses, Integer> {
-    Optional<UserStatuses> findByName(String name);
+public interface UserStatusesRepository extends JpaRepository<UserStatusModel, Integer> {
+    Optional<UserStatusModel> findByName(String name);
 }

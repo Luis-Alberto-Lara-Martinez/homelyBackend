@@ -5,8 +5,8 @@ import jakarta.validation.Valid;
 import org.educa.homelyBackend.dtos.CheckResetTokenRequest;
 import org.educa.homelyBackend.dtos.ForgetUserPasswordRequest;
 import org.educa.homelyBackend.dtos.ResetUserPasswordRequest;
-import org.educa.homelyBackend.services.dedicated.ResetPasswordTokensService;
-import org.educa.homelyBackend.services.dedicated.UsersService;
+import org.educa.homelyBackend.services.dedicated.ResetTokenService;
+import org.educa.homelyBackend.services.dedicated.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,25 +25,25 @@ public class ResetPasswordTokensController extends BaseController {
 
     // TODO: revisar archivo entero
 
-    private final UsersService usersService;
-    private final ResetPasswordTokensService resetPasswordTokensService;
+    private final UserService userService;
+    private final ResetTokenService resetTokenService;
 
-    public ResetPasswordTokensController(UsersService usersService, ResetPasswordTokensService resetPasswordTokensService) {
-        this.usersService = usersService;
-        this.resetPasswordTokensService = resetPasswordTokensService;
+    public ResetPasswordTokensController(UserService userService, ResetTokenService resetTokenService) {
+        this.userService = userService;
+        this.resetTokenService = resetTokenService;
     }
 
     @PostMapping("/olvidar-contrasena")
     public ResponseEntity<Map<String, String>> forgetUserPassword(@Valid @RequestBody ForgetUserPasswordRequest request) {
         String email = request.email().toLowerCase();
 
-        Optional<Users> userLooked = usersService.findByEmail(email);
+        Optional<Users> userLooked = userService.findByEmail(email);
 
         if (userLooked.isEmpty())
             return badRequestCustomized("No se ha encontrado ningún usuario con el email proporcionado");
 
         try {
-            resetPasswordTokensService.processNewResetPasswordTokens(userLooked.get());
+            resetTokenService.processNewResetPasswordTokens(userLooked.get());
         } catch (ResendException e) {
             return badRequestCustomized("Error al enviar el email de recuperación");
         }
@@ -56,18 +56,18 @@ public class ResetPasswordTokensController extends BaseController {
         String email = request.email().toLowerCase();
         String token = request.token();
 
-        Optional<Users> userLooked = usersService.findByEmail(email);
+        Optional<Users> userLooked = userService.findByEmail(email);
 
         if (userLooked.isEmpty())
             return badRequestCustomized("No se ha encontrado ningún usuario con el email proporcionado");
 
-        List<ResetPasswordTokens> resetPasswordTokensList = resetPasswordTokensService.findByUserOrderByCreatedAtDesc(userLooked.get());
+        List<ResetPasswordTokens> resetPasswordTokensList = resetTokenService.findByUserOrderByCreatedAtDesc(userLooked.get());
 
         if (resetPasswordTokensList.isEmpty())
             return badRequestCustomized("No se han encontrado tokens de recuperación para el usuario proporcionado");
 
         for (ResetPasswordTokens resetPasswordToken : resetPasswordTokensList) {
-            if (!resetPasswordToken.getUsed() && resetPasswordToken.getExpiration().isAfter(Instant.now()) && resetPasswordTokensService.checkToken(token, resetPasswordToken.getHashToken())) {
+            if (!resetPasswordToken.getUsed() && resetPasswordToken.getExpiration().isAfter(Instant.now()) && resetTokenService.checkToken(token, resetPasswordToken.getHashToken())) {
                 return okRequestCustomized("Token válido");
             }
         }
@@ -84,12 +84,12 @@ public class ResetPasswordTokensController extends BaseController {
 
         if (!password.equals(confirmedPassword)) return badRequestCustomized("Las contraseñas no coinciden");
 
-        Optional<Users> userLooked = usersService.findByEmail(email);
+        Optional<Users> userLooked = userService.findByEmail(email);
 
         if (userLooked.isEmpty())
             return badRequestCustomized("No se ha encontrado ningún usuario con el email proporcionado");
 
-        if (resetPasswordTokensService.processNewResetPasswordTokensJustUsed(userLooked.get(), password, token)) {
+        if (resetTokenService.processNewResetPasswordTokensJustUsed(userLooked.get(), password, token)) {
             return okRequestCustomized("Contraseña restablecida exitosamente");
         } else {
             return badRequestCustomized("No se encontró ningún token válido para el usuario proporcionado");

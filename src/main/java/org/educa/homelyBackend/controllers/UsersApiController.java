@@ -1,7 +1,7 @@
 package org.educa.homelyBackend.controllers;
 
 import org.educa.homelyBackend.services.common.CloudinaryService;
-import org.educa.homelyBackend.services.dedicated.UsersService;
+import org.educa.homelyBackend.services.dedicated.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -22,11 +22,11 @@ public class UsersApiController extends BaseController {
 
     // TODO: revisar archivo entero
 
-    private final UsersService usersService;
+    private final UserService userService;
     private final CloudinaryService cloudinaryService;
 
-    public UsersApiController(UsersService usersService, CloudinaryService cloudinaryService) {
-        this.usersService = usersService;
+    public UsersApiController(UserService userService, CloudinaryService cloudinaryService) {
+        this.userService = userService;
         this.cloudinaryService = cloudinaryService;
     }
 
@@ -34,7 +34,7 @@ public class UsersApiController extends BaseController {
     public ResponseEntity<?> getPersonalUserData(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getSubject();
 
-        Optional<Users> userLooked = usersService.findByEmail(email);
+        Optional<Users> userLooked = userService.findByEmail(email);
 
         if (userLooked.isEmpty())
             return badRequestCustomized("No se ha encontrado ningún usuario con el email proporcionado");
@@ -58,7 +58,7 @@ public class UsersApiController extends BaseController {
         boolean makeChanges = false;
         String email = jwt.getSubject();
 
-        Optional<Users> userLooked = usersService.findByEmail(email);
+        Optional<Users> userLooked = userService.findByEmail(email);
 
         if (userLooked.isEmpty())
             return badRequestCustomized("No se ha encontrado ningún usuario con el email proporcionado");
@@ -72,7 +72,7 @@ public class UsersApiController extends BaseController {
 
         if (password != null) {
             if (password.equals(confirmedPassword)) {
-                user.setHashPassword(usersService.encodePassword(password));
+                user.setHashPassword(userService.encodePassword(password));
                 makeChanges = true;
             } else {
                 return badRequestCustomized("Las contraseñas no coinciden");
@@ -91,7 +91,7 @@ public class UsersApiController extends BaseController {
         }
 
         if (makeChanges) {
-            usersService.saveUser(user);
+            userService.saveOrUpdate(user);
             return okRequestCustomized("Datos personales actualizados correctamente");
         } else {
             return okRequestCustomized("No se encontró ningún dato nuevo para actualizar");

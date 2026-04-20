@@ -22,38 +22,72 @@ public class CloudinaryService {
     }
 
     public String uploadAvatarImage(
-            @NotNull(message = "La imagen de avatar es null")
+            @NotNull(message = "Avatar image file is null")
             MultipartFile avatarImageFile,
 
-            @NotNull(message = "El ID de usuario es null")
-            Integer userId) throws IOException {
+            @NotNull(message = "ID user is null")
+            Integer userId
+    ) throws IOException {
         return uploadAvatarImage(avatarImageFile.getBytes(), userId);
     }
 
-    public String uploadAvatarImage(byte[] rawAvatarImage, Integer userId) throws IOException {
+    public String uploadAvatarImage(
+            @NotNull(message = "Avatar image is null")
+            byte[] rawAvatarImage,
+
+            @NotNull(message = "ID user is null")
+            Integer userId
+    ) throws IOException {
         String subfolder = "avatars";
         String fileName = String.valueOf(userId);
 
         return uploadImage(rawAvatarImage, buildUploadOptions(subfolder, fileName));
     }
 
-    public String uploadPropertyImage(MultipartFile propertyImageFile, Integer propertyId, Integer propertyImageOrder) throws IOException {
+    public String uploadPropertyImage(
+            @NotNull(message = "Property image file is null")
+            MultipartFile propertyImageFile,
+
+            @NotNull(message = "ID property is null")
+            Integer propertyId,
+
+            @NotNull(message = "Property image order is null")
+            Integer propertyImageOrder
+    ) throws IOException {
         return uploadPropertyImage(propertyImageFile.getBytes(), propertyId, propertyImageOrder);
     }
 
-    public String uploadPropertyImage(byte[] rawPropertyImage, Integer propertyId, Integer propertyImageOrder) throws IOException {
+    public String uploadPropertyImage(
+            @NotNull(message = "Property image is null")
+            byte[] rawPropertyImage,
+
+            @NotNull(message = "ID property is null")
+            Integer propertyId,
+
+            @NotNull(message = "Property image order is null")
+            Integer propertyImageOrder
+    ) throws IOException {
         String subfolder = "properties";
         String fileName = propertyId + "-" + propertyImageOrder;
 
         return uploadImage(rawPropertyImage, buildUploadOptions(subfolder, fileName));
     }
 
-    public void deleteAvatarImage(Integer userId) throws IOException {
+    public void deleteAvatarImage(
+            @NotNull(message = "ID user is null")
+            Integer userId
+    ) throws IOException {
         String publicId = BASE_DIRECTORY + "/avatars/" + userId;
         deleteImage(publicId, buildDeleteOptions());
     }
 
-    public void deletePropertyImage(Integer propertyId, Integer propertyImageOrder) throws IOException {
+    public void deletePropertyImage(
+            @NotNull(message = "ID property is null")
+            Integer propertyId,
+
+            @NotNull(message = "Property image order is null")
+            Integer propertyImageOrder
+    ) throws IOException {
         String publicId = BASE_DIRECTORY + "/properties/" + propertyId + "-" + propertyImageOrder;
         deleteImage(publicId, buildDeleteOptions());
     }

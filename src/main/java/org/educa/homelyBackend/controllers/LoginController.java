@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import org.educa.homelyBackend.dtos.LoginTraditionalRequest;
 import org.educa.homelyBackend.dtos.RegisterTraditionalRequest;
 import org.educa.homelyBackend.services.common.TokenService;
-import org.educa.homelyBackend.services.dedicated.UsersService;
+import org.educa.homelyBackend.services.dedicated.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -20,11 +20,11 @@ import java.util.Optional;
 @RestController
 public class LoginController extends BaseController {
 
-    private final UsersService usersService;
+    private final UserService userService;
     private final TokenService jwtService;
 
-    public LoginController(UsersService usersService, TokenService jwtService) {
-        this.usersService = usersService;
+    public LoginController(UserService userService, TokenService jwtService) {
+        this.userService = userService;
         this.jwtService = jwtService;
     }
 
@@ -36,13 +36,13 @@ public class LoginController extends BaseController {
         if (email == null) return badRequestCustomized("El token no contiene el claim 'email'");
         if (name == null) return badRequestCustomized("El token no contiene el claim 'name'");
 
-        Optional<Users> searchedUser = usersService.findByEmail(email);
+        Optional<Users> searchedUser = userService.findByEmail(email);
         Users user;
 
         if (searchedUser.isEmpty()) {
             Optional<Users> nuevoUsuario;
             try {
-                nuevoUsuario = usersService.getUserOrCreateNewUser(name, email, null);
+                nuevoUsuario = userService.findOrCreate(name, email, null);
             } catch (ResendException e) {
                 return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
             } catch (IOException e) {
@@ -65,7 +65,7 @@ public class LoginController extends BaseController {
         String email = request.email().toLowerCase();
         String password = request.password();
 
-        Optional<Users> searchedUser = usersService.findByEmail(email);
+        Optional<Users> searchedUser = userService.findByEmail(email);
 
         if (searchedUser.isEmpty()) return badRequestCustomized("No existe ningún usuario con ese email");
 
@@ -74,7 +74,7 @@ public class LoginController extends BaseController {
         if (user.getHashPassword() == null)
             return badRequestCustomized("El usuario no tiene contraseña local");
 
-        if (!usersService.checkPassword(password, user.getHashPassword()))
+        if (!userService.checkPassword(password, user.getHashPassword()))
             return badRequestCustomized("La contraseña es incorrecta");
 
         return createLoginResponse(user);
@@ -90,13 +90,13 @@ public class LoginController extends BaseController {
         if (!password.equals(confirmedPassword))
             return badRequestCustomized("La password y la confirmedPassword no coinciden");
 
-        Optional<Users> searchedUser = usersService.findByEmail(email);
+        Optional<Users> searchedUser = userService.findByEmail(email);
 
         if (searchedUser.isPresent()) return badRequestCustomized("Ya existe un usuario con ese email");
 
         Optional<Users> nuevoUsuario;
         try {
-            nuevoUsuario = usersService.getUserOrCreateNewUser(name, email, password);
+            nuevoUsuario = userService.findOrCreate(name, email, password);
         } catch (ResendException e) {
             return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
         } catch (IOException e) {
