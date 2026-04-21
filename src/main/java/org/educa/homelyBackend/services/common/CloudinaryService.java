@@ -2,6 +2,8 @@ package org.educa.homelyBackend.services.common;
 
 import com.cloudinary.Cloudinary;
 import jakarta.validation.constraints.NotNull;
+import org.educa.homelyBackend.utils.ExceptionUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,8 +29,12 @@ public class CloudinaryService {
 
             @NotNull(message = "ID user is null")
             Integer userId
-    ) throws IOException {
-        return uploadAvatarImage(avatarImageFile.getBytes(), userId);
+    ) {
+        try {
+            return uploadAvatarImage(avatarImageFile.getBytes(), userId);
+        } catch (IOException e) {
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to upload avatar image");
+        }
     }
 
     public String uploadAvatarImage(
@@ -37,11 +43,15 @@ public class CloudinaryService {
 
             @NotNull(message = "ID user is null")
             Integer userId
-    ) throws IOException {
+    ) {
         String subfolder = "avatars";
         String fileName = String.valueOf(userId);
 
-        return uploadImage(rawAvatarImage, buildUploadOptions(subfolder, fileName));
+        try {
+            return uploadImage(rawAvatarImage, buildUploadOptions(subfolder, fileName));
+        } catch (IOException e) {
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to upload avatar image");
+        }
     }
 
     public String uploadPropertyImage(
@@ -53,8 +63,12 @@ public class CloudinaryService {
 
             @NotNull(message = "Property image order is null")
             Integer propertyImageOrder
-    ) throws IOException {
-        return uploadPropertyImage(propertyImageFile.getBytes(), propertyId, propertyImageOrder);
+    ) {
+        try {
+            return uploadPropertyImage(propertyImageFile.getBytes(), propertyId, propertyImageOrder);
+        } catch (IOException e) {
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to upload property image");
+        }
     }
 
     public String uploadPropertyImage(
@@ -66,19 +80,27 @@ public class CloudinaryService {
 
             @NotNull(message = "Property image order is null")
             Integer propertyImageOrder
-    ) throws IOException {
+    ) {
         String subfolder = "properties";
         String fileName = propertyId + "-" + propertyImageOrder;
 
-        return uploadImage(rawPropertyImage, buildUploadOptions(subfolder, fileName));
+        try {
+            return uploadImage(rawPropertyImage, buildUploadOptions(subfolder, fileName));
+        } catch (IOException e) {
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to upload property image");
+        }
     }
 
     public void deleteAvatarImage(
             @NotNull(message = "ID user is null")
             Integer userId
-    ) throws IOException {
+    ) {
         String publicId = BASE_DIRECTORY + "/avatars/" + userId;
-        deleteImage(publicId, buildDeleteOptions());
+        try {
+            deleteImage(publicId, buildDeleteOptions());
+        } catch (IOException e) {
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to delete avatar image");
+        }
     }
 
     public void deletePropertyImage(
@@ -87,9 +109,13 @@ public class CloudinaryService {
 
             @NotNull(message = "Property image order is null")
             Integer propertyImageOrder
-    ) throws IOException {
+    ) {
         String publicId = BASE_DIRECTORY + "/properties/" + propertyId + "-" + propertyImageOrder;
-        deleteImage(publicId, buildDeleteOptions());
+        try {
+            deleteImage(publicId, buildDeleteOptions());
+        } catch (IOException e) {
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to delete property image");
+        }
     }
 
     private String uploadImage(byte[] rawImage, Map<String, String> uploadOptions) throws IOException {

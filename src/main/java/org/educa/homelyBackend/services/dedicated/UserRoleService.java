@@ -2,9 +2,9 @@ package org.educa.homelyBackend.services.dedicated;
 
 import org.educa.homelyBackend.daos.UserRoleDao;
 import org.educa.homelyBackend.models.UserRoleModel;
+import org.educa.homelyBackend.utils.ExceptionUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class UserRoleService {
@@ -15,7 +15,9 @@ public class UserRoleService {
         this.userRolesRepository = userRolesRepository;
     }
 
-    public Optional<UserRoleModel> findByName(String name) {
-        return userRolesRepository.findByName(name);
+    public UserRoleModel findByName(String name) {
+        return userRolesRepository
+                .findByName(name)
+                .orElseThrow(ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "User role not found with name: " + name));
     }
 }

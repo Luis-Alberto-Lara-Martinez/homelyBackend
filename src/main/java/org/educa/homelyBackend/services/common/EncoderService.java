@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Service
 @Validated
-public class TokenService {
+public class EncoderService {
 
     private final PasswordEncoder passwordEncoder;
     private final String secretKey;
@@ -30,11 +30,17 @@ public class TokenService {
     private final String audience;
     private final Clock clock;
 
-    public TokenService(
+    public EncoderService(
             PasswordEncoder passwordEncoder,
-            @Value("${jwt.secret.key}") String secretKey,
-            @Value("${jwt.issuer}") String issuer,
-            @Value("${jwt.audience}") String audience
+
+            @Value("${jwt.secret.key}")
+            String secretKey,
+
+            @Value("${jwt.issuer}")
+            String issuer,
+
+            @Value("${jwt.audience}")
+            String audience
     ) {
         this.passwordEncoder = passwordEncoder;
         this.secretKey = secretKey;

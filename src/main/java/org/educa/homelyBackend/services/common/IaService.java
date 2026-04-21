@@ -21,9 +21,14 @@ public class IaService {
     private final String model;
 
     public IaService(
-            @Value("${spring.ai.openai.api-key}") String apiKey,
-            @Value("${spring.ai.openai.base-url}") String baseUrl,
-            @Value("${spring.ai.openai.chat.options.model}") String model
+            @Value("${spring.ai.openai.api-key}")
+            String apiKey,
+
+            @Value("${spring.ai.openai.base-url}")
+            String baseUrl,
+
+            @Value("${spring.ai.openai.chat.options.model}")
+            String model
     ) {
         this.model = model;
         this.webClient = WebClient.builder()

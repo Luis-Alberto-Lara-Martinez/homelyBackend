@@ -6,8 +6,10 @@ import com.resend.services.emails.model.CreateEmailOptions;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.thymeleaf.TemplateEngine;
@@ -41,14 +43,11 @@ public class EmailService {
 
             @NotBlank(message = "El nombre no puede estar vacío")
             String name
-    ) throws ResendException {
-        sendEmail(
-                name,
-                to,
-                "¡Bienvenido a Homely, %s!".formatted(name),
-                "welcome",
-                null
-        );
+    ) {
+        String subject = "¡Bienvenido a Homely, %s!".formatted(name);
+        String templateName = "welcome";
+
+        sendEmail(to, subject, name, templateName, null);
     }
 
     public void sendResetPasswordEmail(
@@ -64,35 +63,33 @@ public class EmailService {
 
             @NotBlank(message = "El token de reseteo no puede estar vacío")
             String resetToken
-    ) throws ResendException {
-        String resetLink = BASE_FRONTEND_URL + "/reset-password?token=" + resetToken + "&email=" + to;
+    ) {
+        String subject = "Restablece tu contraseña de Homely";
+        String templateName = "reset-password";
+        String resetLink = BASE_FRONTEND_URL + "/reset-password?token=" + resetToken;
 
-        Map<String, Object> variables = Map.of(
+        Map<String, Object> extraVariables = Map.of(
                 "resetLink", resetLink,
                 "expirationTime", String.format("%d minutos", expirationMinutes)
         );
 
-        sendEmail(
-                name,
-                to,
-                "Restablece tu contraseña de Homely",
-                "reset-password",
-                variables
-        );
+        sendEmail(to, subject, name, templateName, extraVariables);
     }
 
     private void sendEmail(
-            String name,
             String to,
             String subject,
+            String name,
             String templateName,
-            Map<String, Object> variables
-    ) throws ResendException {
+            Map<String, Object> extraVariables
+    ) {
         Context context = new Context();
         context.setVariable("name", name);
         context.setVariable("year", Year.now().getValue());
 
-        if (variables != null && !variables.isEmpty()) context.setVariables(variables);
+        if (extraVariables != null && !extraVariables.isEmpty()) {
+            context.setVariables(extraVariables);
+        }
 
         String html = templateEngine.process(templateName, context);
 
@@ -104,6 +101,10 @@ public class EmailService {
                 .text(Jsoup.parse(html).text())
                 .build();
 
-        resend.emails().send(params);
+        try {
+            resend.emails().send(params);
+        } catch (ResendException e) {
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error sending email by Resend");
+        }
     }
 }

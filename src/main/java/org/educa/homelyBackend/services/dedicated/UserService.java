@@ -1,46 +1,45 @@
 package org.educa.homelyBackend.services.dedicated;
 
-import com.resend.core.exception.ResendException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.educa.homelyBackend.daos.UsersRepository;
+import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.models.UserRoleModel;
 import org.educa.homelyBackend.models.UserStatusModel;
 import org.educa.homelyBackend.services.common.AvatarService;
 import org.educa.homelyBackend.services.common.CloudinaryService;
 import org.educa.homelyBackend.services.common.EmailService;
+import org.educa.homelyBackend.services.common.EncoderService;
+import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import java.io.IOException;
-import java.util.Optional;
 
 @Service
 @Validated
 public class UserService {
 
-    private final UsersRepository usersRepository;
+    private final UserDao userDao;
     private final UserRoleService userRoleService;
     private final UserStatusService userStatusService;
-    private final PasswordEncoderService passwordEncoderService;
     private final EmailService emailService;
     private final CloudinaryService cloudinaryService;
     private final AvatarService avatarService;
+    private final EncoderService encoderService;
 
-    public UserService(UsersRepository usersRepository, UserRoleService userRoleService, UserStatusService userStatusService, PasswordEncoderService passwordEncoderService, EmailService emailService, CloudinaryService cloudinaryService, AvatarService avatarService) {
-        this.usersRepository = usersRepository;
+    public UserService(UserDao userDao, UserRoleService userRoleService, UserStatusService userStatusService, EmailService emailService, CloudinaryService cloudinaryService, AvatarService avatarService, EncoderService encoderService) {
+        this.userDao = userDao;
         this.userRoleService = userRoleService;
         this.userStatusService = userStatusService;
-        this.passwordEncoderService = passwordEncoderService;
         this.emailService = emailService;
         this.cloudinaryService = cloudinaryService;
         this.avatarService = avatarService;
+        this.encoderService = encoderService;
     }
 
     public Page<UserModel> findAll(Integer page, Integer size) {
@@ -60,23 +59,31 @@ public class UserService {
                 ? "id"
                 : sortBy;
 
-        return usersRepository.findAll(PageRequest.of(pageNumber, sizeNumber, Sort.by(sortParameter).ascending()));
+        Page<UserModel> pagedUsers = userDao.findAll(PageRequest.of(pageNumber, sizeNumber, Sort.by(sortParameter).ascending()));
+
+        if (pagedUsers.isEmpty()) {
+            throw ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "No users found").get();
+        }
+
+        return pagedUsers;
     }
 
-    public Optional<UserModel> findByEmail(
+    public UserModel findByEmail(
             @NotBlank(message = "El email no puede estar vacío")
             @Email(message = "Formato de email inválido")
             String email
     ) {
-        return usersRepository.findByEmail(email);
+        return userDao
+                .findByEmail(email)
+                .orElseThrow(ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "User not found with email: " + email));
     }
 
     public UserModel saveOrUpdate(@NotNull UserModel user) {
-        return usersRepository.save(user);
+        return userDao.save(user);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Optional<UserModel> findOrCreate(
+    public UserModel createAndSendWelcomeEmail(
             @NotBlank(message = "El nombre no puede estar vacío")
             String name,
 
@@ -85,37 +92,27 @@ public class UserService {
             String email,
 
             String password
-    ) throws IOException, ResendException {
-        Optional<UserModel> userSearched = findByEmail(email);
+    ) {
+        UserRoleModel rol = userRoleService.findByName("USER");
+        UserStatusModel status = userStatusService.findByName("ACTIVE");
 
-        if (userSearched.isPresent()) {
-            return userSearched;
-        }
-
-        Optional<UserRoleModel> userRol = userRoleService.findByName("USER");
-        Optional<UserStatusModel> userStatus = userStatusService.findByName("ACTIVE");
-
-        if (userRol.isEmpty() || userStatus.isEmpty()) {
-            return Optional.empty();
-        }
-
-        UserModel newUser = new UserModel();
-        newUser.setRole(userRol.get());
-        newUser.setStatus(userStatus.get());
-        newUser.setName(name);
-        newUser.setEmail(email);
+        UserModel user = new UserModel();
+        user.setRole(rol);
+        user.setStatus(status);
+        user.setName(name);
+        user.setEmail(email);
 
         if (password != null && !password.isBlank()) {
-            newUser.setHashedPassword(passwordEncoderService.generateHash(password));
+            user.setHashedPassword(encoderService.generateHashPassword(password));
         }
 
-        newUser = saveOrUpdate(newUser);
+        user = saveOrUpdate(user);
 
-        String imageUrl = cloudinaryService.uploadAvatarImage(avatarService.generateAvatar(name), newUser.getId());
-        newUser.setImageUrl(imageUrl);
+        String imageUrl = cloudinaryService.uploadAvatarImage(avatarService.generateAvatar(name), user.getId());
+        user.setImageUrl(imageUrl);
 
         emailService.sendWelcomeEmail(email, name);
 
-        return Optional.of(saveOrUpdate(newUser));
+        return saveOrUpdate(user);
     }
 }

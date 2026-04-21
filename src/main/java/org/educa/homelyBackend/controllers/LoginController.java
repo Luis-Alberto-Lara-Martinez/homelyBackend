@@ -4,7 +4,7 @@ import com.resend.core.exception.ResendException;
 import jakarta.validation.Valid;
 import org.educa.homelyBackend.dtos.LoginTraditionalRequest;
 import org.educa.homelyBackend.dtos.RegisterTraditionalRequest;
-import org.educa.homelyBackend.services.common.TokenService;
+import org.educa.homelyBackend.services.common.EncoderService;
 import org.educa.homelyBackend.services.dedicated.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,9 +21,9 @@ import java.util.Optional;
 public class LoginController extends BaseController {
 
     private final UserService userService;
-    private final TokenService jwtService;
+    private final EncoderService jwtService;
 
-    public LoginController(UserService userService, TokenService jwtService) {
+    public LoginController(UserService userService, EncoderService jwtService) {
         this.userService = userService;
         this.jwtService = jwtService;
     }
