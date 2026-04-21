@@ -18,14 +18,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
-public class UsersApiController extends BaseController {
+public class UserController extends BaseController {
 
     // TODO: revisar archivo entero
 
     private final UserService userService;
     private final CloudinaryService cloudinaryService;
 
-    public UsersApiController(UserService userService, CloudinaryService cloudinaryService) {
+    public UserController(UserService userService, CloudinaryService cloudinaryService) {
         this.userService = userService;
         this.cloudinaryService = cloudinaryService;
     }

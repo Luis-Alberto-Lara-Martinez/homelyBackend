@@ -78,8 +78,27 @@ public class UserService {
                 .orElseThrow(ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "User not found with email: " + email));
     }
 
-    public UserModel saveOrUpdate(@NotNull UserModel user) {
+    public boolean existsByEmail(String email) {
+        return userDao.findByEmail(email).isPresent();
+    }
+
+    public UserModel saveOrUpdate(
+            @NotNull(message = "The user cannot be null")
+            UserModel user
+    ) {
         return userDao.save(user);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public UserModel createAndSendWelcomeEmail(
+            @NotBlank(message = "El nombre no puede estar vacío")
+            String name,
+
+            @NotBlank(message = "El email no puede estar vacío")
+            @Email(message = "Formato de email inválido")
+            String email
+    ) {
+        return createAndSendWelcomeEmail(name, email, null);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -93,6 +112,10 @@ public class UserService {
 
             String password
     ) {
+        if (existsByEmail(email)) {
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The email is already register").get();
+        }
+
         UserRoleModel rol = userRoleService.findByName("USER");
         UserStatusModel status = userStatusService.findByName("ACTIVE");
 

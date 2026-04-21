@@ -32,13 +32,28 @@ public class ResetTokenService {
         this.emailService = emailService;
     }
 
-    public ResetTokenModel findByHashedToken(
+    public ResetTokenModel findByToken(
             @NotBlank(message = "User cannot be null nor empty")
             String token
     ) {
+        resetTokenDao.findByHashedTokenAndUsedOrderByCreatedAtDesc
         return resetTokenDao
                 .findByHashedToken(encoderService.generateHashToken(token))
                 .orElseThrow(ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "No reset token found for the provided token"));
+    }
+
+    public boolean existsByToken(
+            @NotBlank(message = "User cannot be null nor empty")
+            String token
+    ) {
+        return resetTokenDao.findByHashedToken(encoderService.generateHashToken(token)).isPresent();
+    }
+
+    public boolean checkExpirationIsAfterNow(
+            @NotNull(message = "ResetToken cannot be null")
+            ResetTokenModel resetToken
+    ) {
+        return resetToken.getExpiration().isAfter(Instant.now());
     }
 
     public ResetTokenModel saveOrUpdate(ResetTokenModel resetTokenModel) {
@@ -69,15 +84,13 @@ public class ResetTokenService {
 
     @Transactional(rollbackFor = Exception.class)
     public void updateUsed(
-            @NotBlank(message = "Token cannot be null nor empty")
-            String token,
+            @NotNull(message = "ResetToken cannot be null")
+            ResetTokenModel resetToken,
 
             @NotNull(message = "Used cannot be null")
             Boolean used
     ) {
-        ResetTokenModel resetToken = findByHashedToken(token);
         resetToken.setUsed(used);
-
         saveOrUpdate(resetToken);
     }
 }

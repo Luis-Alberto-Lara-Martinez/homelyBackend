@@ -1,11 +1,13 @@
 package org.educa.homelyBackend.controllers;
 
-import com.resend.core.exception.ResendException;
 import jakarta.validation.Valid;
 import org.educa.homelyBackend.dtos.LoginTraditionalRequest;
 import org.educa.homelyBackend.dtos.RegisterTraditionalRequest;
+import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.common.EncoderService;
 import org.educa.homelyBackend.services.dedicated.UserService;
+import org.educa.homelyBackend.utils.ExceptionUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -13,113 +15,89 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
-public class LoginController extends BaseController {
+public class LoginController {
 
     private final UserService userService;
-    private final EncoderService jwtService;
+    private final EncoderService encoderService;
 
-    public LoginController(UserService userService, EncoderService jwtService) {
+    public LoginController(UserService userService, EncoderService encoderService) {
         this.userService = userService;
-        this.jwtService = jwtService;
+        this.encoderService = encoderService;
     }
 
     @PostMapping("/oauth2/login")
-    public ResponseEntity<Map<String, String>> oauth2LoginAndRegister(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Map<String, String>> oauth2LogIn(@AuthenticationPrincipal Jwt jwt) {
+        String email = jwt.getClaim("email");
+
+        if (email == null) {
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The token does not contain the claim 'email'").get();
+        }
+
+        UserModel user = userService.findByEmail(email);
+
+        return createLogInResponse(user);
+    }
+
+    @PostMapping("/oauth2/register")
+    public ResponseEntity<Map<String, String>> oauth2Register(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getClaim("email");
         String name = jwt.getClaim("name");
 
-        if (email == null) return badRequestCustomized("El token no contiene el claim 'email'");
-        if (name == null) return badRequestCustomized("El token no contiene el claim 'name'");
-
-        Optional<Users> searchedUser = userService.findByEmail(email);
-        Users user;
-
-        if (searchedUser.isEmpty()) {
-            Optional<Users> nuevoUsuario;
-            try {
-                nuevoUsuario = userService.findOrCreate(name, email, null);
-            } catch (ResendException e) {
-                return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
-            } catch (IOException e) {
-                return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al generar el avatar");
-            }
-
-            if (nuevoUsuario.isEmpty())
-                return badRequestCustomized("No se pudo crear el usuario porque no se encontró el rol o el status especificados");
-
-            user = nuevoUsuario.get();
-        } else {
-            user = searchedUser.get();
+        if (email == null) {
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The token does not contain the claim 'email'").get();
         }
 
-        return createLoginResponse(user);
+        if (name == null) {
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The token does not contain the claim 'name'").get();
+        }
+
+        UserModel user = userService.createAndSendWelcomeEmail(name, email);
+
+        return createLogInResponse(user);
     }
 
     @PostMapping("/local/login")
-    public ResponseEntity<Map<String, String>> loginTraditional(@Valid @RequestBody LoginTraditionalRequest request) {
+    public ResponseEntity<Map<String, String>> localLogIn(@Valid @RequestBody LoginTraditionalRequest request) {
         String email = request.email().toLowerCase();
         String password = request.password();
 
-        Optional<Users> searchedUser = userService.findByEmail(email);
+        UserModel user = userService.findByEmail(email);
 
-        if (searchedUser.isEmpty()) return badRequestCustomized("No existe ningún usuario con ese email");
-
-        Users user = searchedUser.get();
-
-        if (user.getHashPassword() == null)
-            return badRequestCustomized("El usuario no tiene contraseña local");
-
-        if (!userService.checkPassword(password, user.getHashPassword()))
-            return badRequestCustomized("La contraseña es incorrecta");
-
-        return createLoginResponse(user);
+        if (encoderService.checkHashPassword(password, user.getHashedPassword())) {
+            return createLogInResponse(user);
+        } else {
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The password is incorrect").get();
+        }
     }
 
     @PostMapping("/local/register")
-    public ResponseEntity<Map<String, String>> registerTraditional(@Valid @RequestBody RegisterTraditionalRequest request) {
+    public ResponseEntity<Map<String, String>> localRegister(@Valid @RequestBody RegisterTraditionalRequest request) {
         String name = request.name().trim();
         String email = request.email().toLowerCase();
         String password = request.password();
         String confirmedPassword = request.confirmedPassword();
 
-        if (!password.equals(confirmedPassword))
-            return badRequestCustomized("La password y la confirmedPassword no coinciden");
-
-        Optional<Users> searchedUser = userService.findByEmail(email);
-
-        if (searchedUser.isPresent()) return badRequestCustomized("Ya existe un usuario con ese email");
-
-        Optional<Users> nuevoUsuario;
-        try {
-            nuevoUsuario = userService.findOrCreate(name, email, password);
-        } catch (ResendException e) {
-            return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al enviar el email de bienvenida");
-        } catch (IOException e) {
-            return badRequestCustomized("No se pudo crear el usuario porque ocurrió un error al generar el avatar");
+        if (!password.equals(confirmedPassword)) {
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The password and the confirmed password do not match").get();
         }
 
-        if (nuevoUsuario.isEmpty())
-            return badRequestCustomized("No se pudo crear el usuario porque no se encontró el rol o el status especificados");
+        UserModel user = userService.createAndSendWelcomeEmail(name, email, password);
 
-        Users user = nuevoUsuario.get();
-
-        return createLoginResponse(user);
+        return createLogInResponse(user);
     }
 
-    private ResponseEntity<Map<String, String>> createLoginResponse(Users user) {
-        String token = jwtService.generatePersonalizedJwt(user.getEmail(), Map.of(
+    private ResponseEntity<Map<String, String>> createLogInResponse(UserModel user) {
+        String jwt = encoderService.generatePersonalizedJwt(user.getEmail(), Map.of(
                 "name", user.getName(),
-                "role", user.getIdRole().getName()
+                "role", user.getRole().getName()
         ));
 
         return ResponseEntity.ok(Map.of(
-                "message", "Inicio de sesión correcto",
-                "token", token
+                "message", "Successful login",
+                "token", jwt
         ));
     }
 }

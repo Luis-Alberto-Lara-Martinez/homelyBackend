@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,25 +57,15 @@ public class EncoderService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
     }
 
-    public String generatePersonalizedJwt(
-            @NotBlank(message = "Email cannot be null or empty")
-            @Email(message = "Invalid email format")
-            String email
-    ) {
-        return generatePersonalizedJwt(email, null);
-    }
 
     public String generatePersonalizedJwt(
             @NotBlank(message = "Email cannot be null or empty")
             @Email(message = "Invalid email format")
             String email,
 
+            @NotNull(message = "Extra claims cannot be null")
             Map<String, Object> extraClaims
     ) {
-        if (extraClaims == null) {
-            extraClaims = Map.of();
-        }
-
         Instant now = clock.instant();
 
         return Jwts.builder()
