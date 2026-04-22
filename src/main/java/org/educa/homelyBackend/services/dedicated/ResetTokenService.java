@@ -25,35 +25,36 @@ public class ResetTokenService {
     private final ResetTokenDao resetTokenDao;
     private final EncoderService encoderService;
     private final EmailService emailService;
+    private final UserService userService;
 
-    public ResetTokenService(ResetTokenDao resetTokenDao, EncoderService encoderService, EmailService emailService) {
+    public ResetTokenService(ResetTokenDao resetTokenDao, EncoderService encoderService, EmailService emailService, UserService userService) {
         this.resetTokenDao = resetTokenDao;
         this.encoderService = encoderService;
         this.emailService = emailService;
+        this.userService = userService;
     }
 
-    public ResetTokenModel findByToken(
+    public ResetTokenModel findByTokenOrThrow(
             @NotBlank(message = "User cannot be null nor empty")
             String token
     ) {
-        resetTokenDao.findByHashedTokenAndUsedOrderByCreatedAtDesc
-        return resetTokenDao
-                .findByHashedToken(encoderService.generateHashToken(token))
-                .orElseThrow(ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "No reset token found for the provided token"));
+        return resetTokenDao.findByHashedToken(encoderService.generateHashedToken(token))
+                .orElseThrow(() -> ExceptionUtil.manageException(
+                        HttpStatus.NOT_FOUND,
+                        "There is no reset token with that token"
+                ).get());
     }
 
-    public boolean existsByToken(
-            @NotBlank(message = "User cannot be null nor empty")
-            String token
-    ) {
-        return resetTokenDao.findByHashedToken(encoderService.generateHashToken(token)).isPresent();
-    }
-
-    public boolean checkExpirationIsAfterNow(
+    @Transactional(rollbackFor = Exception.class)
+    public void checkTokenAndUpdateIfExpired(
             @NotNull(message = "ResetToken cannot be null")
             ResetTokenModel resetToken
     ) {
-        return resetToken.getExpiration().isAfter(Instant.now());
+        if (resetToken.getExpiration().isBefore(Instant.now()) || resetToken.getUsed()) {
+            resetToken.setUsed(false);
+            saveOrUpdate(resetToken);
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The provided token is expired or used").get();
+        }
     }
 
     public ResetTokenModel saveOrUpdate(ResetTokenModel resetTokenModel) {
@@ -65,11 +66,11 @@ public class ResetTokenService {
             @NotNull(message = "User cannot be null")
             UserModel user
     ) {
-        String resetToken = encoderService.generateSecureRandomToken();
+        String token = encoderService.generateSecureRandomToken();
 
         ResetTokenModel resetTokenModel = new ResetTokenModel();
         resetTokenModel.setUser(user);
-        resetTokenModel.setHashedToken(encoderService.generateHashToken(resetToken));
+        resetTokenModel.setHashedToken(encoderService.generateHashedToken(token));
         resetTokenModel.setExpiration(Instant.now().plus(Duration.ofMinutes(EXPIRATION_MINUTES)));
 
         resetTokenModel = saveOrUpdate(resetTokenModel);
@@ -78,19 +79,14 @@ public class ResetTokenService {
                 resetTokenModel.getUser().getEmail(),
                 resetTokenModel.getUser().getName(),
                 EXPIRATION_MINUTES,
-                resetToken
+                token
         );
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void updateUsed(
-            @NotNull(message = "ResetToken cannot be null")
-            ResetTokenModel resetToken,
-
-            @NotNull(message = "Used cannot be null")
-            Boolean used
-    ) {
-        resetToken.setUsed(used);
+    public void updateUserAndUsed(ResetTokenModel resetToken, String password) {
+        resetToken.setUsed(true);
         saveOrUpdate(resetToken);
+        userService.updateHashedPassword(resetToken.getUser(), password);
     }
 }

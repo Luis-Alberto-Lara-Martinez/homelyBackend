@@ -80,24 +80,23 @@ public class EncoderService {
                 .compact();
     }
 
-    public boolean checkHashPassword(
+    public boolean checkHashedPassword(
             @NotBlank(message = "Raw password is null or empty")
             String rawPassword,
 
-            @NotBlank(message = "Hash password is null or empty")
             String hashPassword
     ) {
         return passwordEncoder.matches(rawPassword, hashPassword);
     }
 
-    public String generateHashPassword(
+    public String generateHashedPassword(
             @NotBlank(message = "Raw password is null or empty")
             String rawPassword
     ) {
         return passwordEncoder.encode(rawPassword);
     }
 
-    public String generateHashToken(
+    public String generateHashedToken(
             @NotBlank(message = "Token is null or empty")
             String token
     ) {
