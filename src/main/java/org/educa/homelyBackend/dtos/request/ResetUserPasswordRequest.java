@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.dtos;
+package org.educa.homelyBackend.dtos.request;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,8 +1,8 @@
 package org.educa.homelyBackend.controllers.auth;
 
 import jakarta.validation.Valid;
-import org.educa.homelyBackend.dtos.LocalLogInRequest;
-import org.educa.homelyBackend.dtos.LocalRegisterRequest;
+import org.educa.homelyBackend.dtos.request.LocalLogInRequest;
+import org.educa.homelyBackend.dtos.request.LocalRegisterRequest;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.common.LogInService;
 import org.educa.homelyBackend.services.dedicated.UserService;

@@ -1,9 +1,9 @@
 package org.educa.homelyBackend.controllers.api;
 
 import jakarta.validation.Valid;
-import org.educa.homelyBackend.dtos.CheckResetTokenRequest;
-import org.educa.homelyBackend.dtos.ForgetUserPasswordRequest;
-import org.educa.homelyBackend.dtos.ResetUserPasswordRequest;
+import org.educa.homelyBackend.dtos.request.CheckResetTokenRequest;
+import org.educa.homelyBackend.dtos.request.ForgetUserPasswordRequest;
+import org.educa.homelyBackend.dtos.request.ResetUserPasswordRequest;
 import org.educa.homelyBackend.services.dedicated.ResetTokenService;
 import org.educa.homelyBackend.services.dedicated.UserService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
