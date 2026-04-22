@@ -10,12 +10,12 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -25,14 +25,15 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@DynamicInsert
 @Entity
 @Table(
         name = "reset_tokens",
         indexes = {
                 @Index(name = "idx_reset_tokens_user_id", columnList = "user_id"),
-                @Index(name = "idx_reset_tokens_hashed_token", columnList = "hashed_token"),
                 @Index(name = "idx_reset_tokens_expiration_used", columnList = "expiration, used")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "reset_tokens_hashed_token_key", columnNames = {"hashed_token"})
         }
 )
 public class ResetTokenModel {
