@@ -44,17 +44,27 @@ public class UserService {
         this.encoderService = encoderService;
     }
 
-    public Page<UserModel> findAll(@NotNull(message = "The page cannot be null") @Min(value = 1, message = "The page must be greater than or equal to 1") Integer page,
+    public Page<UserModel> findAll(
+            @NotNull(message = "The page cannot be null")
+            @Min(value = 1, message = "The page must be greater than or equal to 1")
+            Integer page,
 
-                                   @NotNull @Min(value = 1, message = "The size must be greater than or equal to 1") Integer size) {
+            @NotNull @Min(value = 1, message = "The size must be greater than or equal to 1")
+            Integer size
+    ) {
         return findAll(page, size, null);
     }
 
-    public Page<UserModel> findAll(@NotNull(message = "The page cannot be null") @Min(value = 1, message = "The page must be greater than or equal to 1") Integer page,
+    public Page<UserModel> findAll(
+            @NotNull(message = "The page cannot be null")
+            @Min(value = 1, message = "The page must be greater than or equal to 1")
+            Integer page,
 
-                                   @NotNull @Min(value = 1, message = "The size must be greater than or equal to 1") Integer size,
+            @NotNull(message = "The size cannot be null")
+            @Min(value = 1, message = "The size must be greater than or equal to 1") Integer size,
 
-                                   String sortBy) {
+            String sortBy
+    ) {
         String sortParameter = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
 
         Page<UserModel> pagedUsers = userDao.findAll(PageRequest.of(page - 1, size, Sort.by(sortParameter).ascending()));
@@ -66,36 +76,63 @@ public class UserService {
         return pagedUsers;
     }
 
-    public Optional<UserModel> findByEmail(@NotBlank(message = "El email no puede estar vacío") @Email(message = "Formato de email inválido") String email) {
+    public Optional<UserModel> findByEmail(
+            @NotBlank(message = "El email no puede estar vacío")
+            @Email(message = "Formato de email inválido")
+            String email
+    ) {
         return userDao.findByEmail(email);
     }
 
-    public UserModel findByEmailOrThrow(@NotBlank(message = "El email no puede estar vacío") @Email(message = "Formato de email inválido") String email) {
-        return findByEmail(email).orElseThrow(() -> ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "There is no user with that email").get());
+    public UserModel findByEmailOrThrow(
+            @NotBlank(message = "El email no puede estar vacío")
+            @Email(message = "Formato de email inválido")
+            String email
+    ) {
+        return findByEmail(email).orElseThrow(() -> ExceptionUtil.manageException(
+                HttpStatus.NOT_FOUND,
+                "There is no user with that email"
+        ).get());
     }
 
-    public UserModel saveOrUpdate(@NotNull(message = "The user cannot be null") UserModel user) {
+    public UserModel saveOrUpdate(
+            @NotNull(message = "The user cannot be null") UserModel user
+    ) {
         return userDao.save(user);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public UserModel createAndSendWelcomeEmail(@NotBlank(message = "El nombre no puede estar vacío") String name,
+    public UserModel createAndSendWelcomeEmail(
+            @NotBlank(message = "El nombre no puede estar vacío")
+            String name,
 
-                                               @NotBlank(message = "El email no puede estar vacío") @Email(message = "Formato de email inválido") String email) {
+            @NotBlank(message = "El email no puede estar vacío")
+            @Email(message = "Formato de email inválido")
+            String email
+    ) {
         return createAndSendWelcomeEmail(name, email, null);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public UserModel createAndSendWelcomeEmail(@NotBlank(message = "El nombre no puede estar vacío") String name,
+    public UserModel createAndSendWelcomeEmail(
+            @NotBlank(message = "El nombre no puede estar vacío")
+            String name,
 
-                                               @NotBlank(message = "El email no puede estar vacío") @Email(message = "Formato de email inválido") String email,
+            @NotBlank(message = "El email no puede estar vacío")
+            @Email(message = "Formato de email inválido")
+            String email,
 
-                                               String password) {
+            String password
+    ) {
         if (findByEmail(email).isPresent()) {
             throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The email is already register").get();
         }
 
-        UserModel user = UserModel.builder().role(userRoleService.findByNameOrThrow("USER")).status(userStatusService.findByNameOrThrow("ACTIVE")).name(name).email(email).build();
+        UserModel user = new UserModel();
+        user.setRole(userRoleService.findByNameOrThrow("USER"));
+        user.setStatus(userStatusService.findByNameOrThrow("ACTIVE"));
+        user.setName(name);
+        user.setEmail(email);
 
         if (password != null && !password.isBlank()) {
             user.setHashedPassword(encoderService.generateHashedPassword(password));
@@ -111,43 +148,13 @@ public class UserService {
         return saveOrUpdate(user);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public boolean updateProfile(String email, MultipartFile avatarFile, String name, String password, String confirmedPassword) {
+    public void updateHashedPassword(
+            @NotNull(message = "The user cannot be null")
+            UserModel user,
 
-        UserModel user = findByEmailOrThrow(email);
-
-        boolean makeChanges = false;
-
-        if (name != null && !name.trim().equals(user.getName())) {
-            user.setName(name.trim());
-            makeChanges = true;
-        }
-        aaaa
-
-        if (password != null) {
-            if (password.equals(confirmedPassword)) {
-                user.setHashedPassword(encoderService.generateHashedPassword(password));
-                makeChanges = true;
-            } else {
-                throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The passwords do not match").get();
-            }
-        }
-
-        if (avatarFile != null && !avatarFile.isEmpty()) {
-            user.setImageUrl(cloudinaryService.uploadAvatarImage(avatarFile, user.getId()));
-            makeChanges = true;
-        }
-
-        if (makeChanges) {
-            saveOrUpdate(user);
-        }
-
-        return makeChanges;
-    }
-
-    public void updateHashedPassword(@NotNull(message = "The user cannot be null") UserModel user,
-
-                                     @NotBlank(message = "The password cannot be null nor empty") String password) {
+            @NotBlank(message = "The password cannot be null nor empty")
+            String password
+    ) {
         user.setHashedPassword(encoderService.generateHashedPassword(password));
         saveOrUpdate(user);
     }
@@ -156,5 +163,21 @@ public class UserService {
         if (!encoderService.checkHashedPassword(password, hashedPassword)) {
             throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The password is incorrect").get();
         }
+    }
+
+    public String updateImage(String email, MultipartFile avatarFile) {
+        UserModel user = findByEmailOrThrow(email);
+
+        user.setImageUrl(cloudinaryService.uploadAvatarImage(avatarFile, user.getId()));
+
+        return saveOrUpdate(user).getImageUrl();
+    }
+
+    public String updateName(String email, String name) {
+        UserModel user = findByEmailOrThrow(email);
+
+        user.setName(name);
+
+        return saveOrUpdate(user).getName();
     }
 }
