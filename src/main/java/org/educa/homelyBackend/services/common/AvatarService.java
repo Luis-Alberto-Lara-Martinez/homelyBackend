@@ -1,10 +1,8 @@
 package org.educa.homelyBackend.services.common;
 
-import jakarta.validation.constraints.NotBlank;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -17,16 +15,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @Service
-@Validated
 public class AvatarService {
 
     private static final Integer AVATAR_SIZE = 500;
     private static final String FONT_NAME = "Arial";
 
-    public byte[] generateAvatar(
-            @NotBlank(message = "The name used to generate the avatar is null or empty")
-            String name
-    ) {
+    public byte[] generateAvatar(String name) {
         String initials = obtainInitials(name);
 
         BufferedImage avatarImage = new BufferedImage(AVATAR_SIZE, AVATAR_SIZE, BufferedImage.TYPE_INT_ARGB);
@@ -56,7 +50,7 @@ public class AvatarService {
             ImageIO.write(avatarImage, "png", baos);
             return baos.toByteArray();
         } catch (IOException e) {
-            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to generate avatar image");
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error al generar el avatar");
         }
     }
 

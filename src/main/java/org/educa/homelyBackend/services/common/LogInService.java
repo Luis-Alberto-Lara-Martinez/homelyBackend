@@ -8,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Map;
 
 @Service
-@Validated
 public class LogInService {
 
     private final EncoderService encoderService;

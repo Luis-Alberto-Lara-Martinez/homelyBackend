@@ -1,21 +1,20 @@
 package org.educa.homelyBackend.services.common;
 
 import com.cloudinary.Cloudinary;
-import jakarta.validation.constraints.NotNull;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
 
 @Service
-@Validated
 public class CloudinaryService {
 
     private static final String BASE_DIRECTORY = "homely";
+    private static final String AVATARS_DIRECTORY = BASE_DIRECTORY + "/avatars";
+    private static final String PROPERTIES_DIRECTORY = BASE_DIRECTORY + "/properties";
 
     private final Cloudinary cloudinary;
 
@@ -23,122 +22,63 @@ public class CloudinaryService {
         this.cloudinary = cloudinary;
     }
 
-    public String uploadAvatarImage(
-            @NotNull(message = "Avatar image file is null")
-            MultipartFile avatarImageFile,
-
-            @NotNull(message = "ID user is null")
-            Integer userId
-    ) {
-        try {
-            return uploadAvatarImage(avatarImageFile.getBytes(), userId);
-        } catch (IOException e) {
-            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to upload avatar image");
-        }
-    }
-
-    public String uploadAvatarImage(
-            @NotNull(message = "Avatar image is null")
-            byte[] rawAvatarImage,
-
-            @NotNull(message = "ID user is null")
-            Integer userId
-    ) {
-        String subfolder = "avatars";
+    public String uploadAvatarImage(MultipartFile avatarImageFile, Integer userId) {
         String fileName = String.valueOf(userId);
+        byte[] rawAvatarImageFile;
 
         try {
-            return uploadImage(rawAvatarImage, buildUploadOptions(subfolder, fileName));
+            rawAvatarImageFile = avatarImageFile.getBytes();
         } catch (IOException e) {
-            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to upload avatar image");
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error en el tratamiento de la imagen " + fileName);
         }
+
+        return uploadImage(rawAvatarImageFile, AVATARS_DIRECTORY, fileName);
     }
 
-    public String uploadPropertyImage(
-            @NotNull(message = "Property image file is null")
-            MultipartFile propertyImageFile,
-
-            @NotNull(message = "ID property is null")
-            Integer propertyId,
-
-            @NotNull(message = "Property image order is null")
-            Integer propertyImageOrder
-    ) {
-        try {
-            return uploadPropertyImage(propertyImageFile.getBytes(), propertyId, propertyImageOrder);
-        } catch (IOException e) {
-            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to upload property image");
-        }
+    public String uploadAvatarImage(byte[] rawAvatarImageFile, Integer userId) {
+        return uploadImage(rawAvatarImageFile, AVATARS_DIRECTORY, String.valueOf(userId));
     }
 
-    public String uploadPropertyImage(
-            @NotNull(message = "Property image is null")
-            byte[] rawPropertyImage,
-
-            @NotNull(message = "ID property is null")
-            Integer propertyId,
-
-            @NotNull(message = "Property image order is null")
-            Integer propertyImageOrder
-    ) {
-        String subfolder = "properties";
+    public String uploadPropertyImage(MultipartFile propertyImageFile, Integer propertyId, Integer propertyImageOrder) {
         String fileName = propertyId + "-" + propertyImageOrder;
+        byte[] rawPropertyImageFile;
 
         try {
-            return uploadImage(rawPropertyImage, buildUploadOptions(subfolder, fileName));
+            rawPropertyImageFile = propertyImageFile.getBytes();
         } catch (IOException e) {
-            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to upload property image");
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error en el tratamiento de la imagen " + fileName);
+        }
+
+        return uploadImage(rawPropertyImageFile, PROPERTIES_DIRECTORY, fileName);
+    }
+
+    public void deleteAvatarImage(Integer userId) {
+        deleteImage(AVATARS_DIRECTORY + "/" + userId);
+    }
+
+    public void deletePropertyImage(Integer propertyId, Integer propertyImageOrder) {
+        deleteImage(PROPERTIES_DIRECTORY + "/" + propertyId + "-" + propertyImageOrder);
+    }
+
+    private String uploadImage(byte[] rawImageFile, String folder, String fileName) {
+        try {
+            return cloudinary.uploader()
+                    .upload(rawImageFile, Map.of(
+                            "folder", folder,
+                            "public_id", fileName
+                    ))
+                    .get("secure_url")
+                    .toString();
+        } catch (IOException e) {
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error al subir la imagen " + fileName);
         }
     }
 
-    public void deleteAvatarImage(
-            @NotNull(message = "ID user is null")
-            Integer userId
-    ) {
-        String publicId = BASE_DIRECTORY + "/avatars/" + userId;
+    private void deleteImage(String publicId) {
         try {
-            deleteImage(publicId, buildDeleteOptions());
+            cloudinary.uploader().destroy(publicId, Map.of("invalidate", true));
         } catch (IOException e) {
-            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to delete avatar image");
+            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error al eliminar la imagen " + publicId);
         }
-    }
-
-    public void deletePropertyImage(
-            @NotNull(message = "ID property is null")
-            Integer propertyId,
-
-            @NotNull(message = "Property image order is null")
-            Integer propertyImageOrder
-    ) {
-        String publicId = BASE_DIRECTORY + "/properties/" + propertyId + "-" + propertyImageOrder;
-        try {
-            deleteImage(publicId, buildDeleteOptions());
-        } catch (IOException e) {
-            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Failed to delete property image");
-        }
-    }
-
-    private String uploadImage(byte[] rawImage, Map<String, String> uploadOptions) throws IOException {
-        return cloudinary.uploader()
-                .upload(rawImage, uploadOptions)
-                .get("secure_url")
-                .toString();
-    }
-
-    private Map<String, String> buildUploadOptions(String subFolder, String fileName) {
-        return Map.of(
-                "folder", BASE_DIRECTORY + "/" + subFolder,
-                "public_id", fileName
-        );
-    }
-
-    private void deleteImage(String publicId, Map<String, Object> deleteOptions) throws IOException {
-        cloudinary.uploader().destroy(publicId, deleteOptions);
-    }
-
-    private Map<String, Object> buildDeleteOptions() {
-        return Map.of(
-                "invalidate", true
-        );
     }
 }

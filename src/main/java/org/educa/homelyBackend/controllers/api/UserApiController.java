@@ -5,6 +5,8 @@ import org.educa.homelyBackend.dtos.request.UpdateUserNameRequest;
 import org.educa.homelyBackend.dtos.request.UpdateUserPasswordRequest;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.dedicated.UserService;
+import org.educa.homelyBackend.utils.ExceptionUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -29,7 +31,7 @@ public class UserApiController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Map<String, String>> getPersonalUserData(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Map<String, String>> findUserProfile(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getSubject();
 
         UserModel user = userService.findByEmailOrThrow(email);
@@ -42,11 +44,8 @@ public class UserApiController {
 
     @PutMapping("/avatar")
     public ResponseEntity<Map<String, String>> updateUserAvatar(
-            @AuthenticationPrincipal
-            Jwt jwt,
-
-            @RequestPart(value = "avatarFile")
-            MultipartFile avatarFile
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestPart(value = "avatarFile") MultipartFile avatarFile
     ) {
         String email = jwt.getSubject();
 
@@ -58,10 +57,8 @@ public class UserApiController {
     }
 
     @PutMapping("/name")
-    public ResponseEntity<Map<String, String>> updateName(
-            @AuthenticationPrincipal
-            Jwt jwt,
-
+    public ResponseEntity<Map<String, String>> updateUserName(
+            @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody UpdateUserNameRequest request
     ) {
         String email = jwt.getSubject();
@@ -75,7 +72,7 @@ public class UserApiController {
     }
 
     @PutMapping("/password")
-    public ResponseEntity<?> updatePassword(
+    public ResponseEntity<?> updateUserPassword(
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody UpdateUserPasswordRequest request
     ) {
@@ -84,10 +81,10 @@ public class UserApiController {
         String confirmedPassword = request.confirmedPassword();
 
         if (!password.equals(confirmedPassword)) {
-            return ResponseEntity.badRequest().body(Map.of("message", "The password and the confirmed password do not match"));
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden").get();
         }
 
-        // userService.updateHashedPassword(userService.findByEmailOrThrow(email), password);
+        userService.updateHashedPassword(email, password);
         return ResponseEntity.ok().body(Map.of("message", "Password updated successfully"));
     }
 }

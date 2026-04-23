@@ -1,7 +1,5 @@
 package org.educa.homelyBackend.services.dedicated;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.educa.homelyBackend.daos.ResetTokenDao;
 import org.educa.homelyBackend.models.ResetTokenModel;
 import org.educa.homelyBackend.models.UserModel;
@@ -11,13 +9,11 @@ import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 import java.time.Instant;
 
 @Service
-@Validated
 public class ResetTokenService {
 
     private static final Integer EXPIRATION_MINUTES = 20;
@@ -34,26 +30,23 @@ public class ResetTokenService {
         this.userService = userService;
     }
 
-    public ResetTokenModel findByTokenOrThrow(
-            @NotBlank(message = "User cannot be null nor empty")
-            String token
-    ) {
+    public ResetTokenModel findByTokenOrThrow(String token) {
         return resetTokenDao.findByHashedToken(encoderService.generateHashedToken(token))
                 .orElseThrow(() -> ExceptionUtil.manageException(
                         HttpStatus.NOT_FOUND,
-                        "There is no reset token with that token"
+                        "No se encontró ningún token de restablecimiento de contraseña válido para el token proporcionado"
                 ).get());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void checkTokenAndUpdateIfExpired(
-            @NotNull(message = "ResetToken cannot be null")
-            ResetTokenModel resetToken
-    ) {
+    public void checkTokenAndUpdateIfExpired(ResetTokenModel resetToken) {
         if (resetToken.getExpiration().isBefore(Instant.now()) || resetToken.getUsed()) {
             resetToken.setUsed(false);
             saveOrUpdate(resetToken);
-            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The provided token is expired or used").get();
+            throw ExceptionUtil.manageException(
+                    HttpStatus.BAD_REQUEST,
+                    "El token proporcionado está vencido o ya ha sido utilizado"
+            ).get();
         }
     }
 
@@ -62,10 +55,7 @@ public class ResetTokenService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void createAndSendResetEmail(
-            @NotNull(message = "User cannot be null")
-            UserModel user
-    ) {
+    public void createAndSendResetEmail(UserModel user) {
         String token = encoderService.generateSecureRandomToken();
 
         ResetTokenModel resetTokenModel = new ResetTokenModel();

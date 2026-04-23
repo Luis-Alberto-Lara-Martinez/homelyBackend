@@ -2,13 +2,13 @@ package org.educa.homelyBackend.configurations;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.educa.homelyBackend.utils.ResponseEntityUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -20,10 +20,10 @@ public class GlobalExceptionHandler {
         String errorMessage = exception.getBindingResult().getFieldErrors().getFirst().getDefaultMessage();
 
         if (errorMessage == null) {
-            errorMessage = "Unexpected error produced by MethodArgumentNotValidException";
+            errorMessage = "Error inesperado en la validación de los argumentos";
         }
 
-        return ResponseEntity.badRequest().body(Map.of("error", errorMessage));
+        return ResponseEntityUtil.badRequest(errorMessage);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -32,21 +32,19 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(ConstraintViolation::getMessage)
                 .findFirst()
-                .orElse("Unexpected error produced by ConstraintViolationException");
+                .orElse("Error inesperado en la validación de los argumentos");
 
-        return ResponseEntity.badRequest().body(Map.of("error", errorMessage));
+        return ResponseEntityUtil.badRequest(errorMessage);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatusExceptions(ResponseStatusException exception) {
-        Map<String, String> variables = new HashMap<>();
+        String error = exception.getReason();
 
-        if (exception.getReason() != null) {
-            variables.put("error", exception.getReason());
-        } else {
-            variables.put("error", "Not specified error message");
+        if (error == null) {
+            error = "Error inesperado producido por ResponseStatusException";
         }
 
-        return ResponseEntity.status(exception.getStatusCode()).body(variables);
+        return ResponseEntity.status(exception.getStatusCode()).body(Map.of("error", error));
     }
 }

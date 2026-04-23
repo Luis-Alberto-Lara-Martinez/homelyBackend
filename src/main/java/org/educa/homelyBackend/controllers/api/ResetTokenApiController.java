@@ -2,8 +2,8 @@ package org.educa.homelyBackend.controllers.api;
 
 import jakarta.validation.Valid;
 import org.educa.homelyBackend.dtos.request.CheckResetTokenRequest;
-import org.educa.homelyBackend.dtos.request.ForgetUserPasswordRequest;
-import org.educa.homelyBackend.dtos.request.ResetUserPasswordRequest;
+import org.educa.homelyBackend.dtos.request.ForgottenPasswordRequest;
+import org.educa.homelyBackend.dtos.request.ResetPasswordRequest;
 import org.educa.homelyBackend.services.dedicated.ResetTokenService;
 import org.educa.homelyBackend.services.dedicated.UserService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
@@ -31,12 +31,12 @@ public class ResetTokenApiController {
     }
 
     @PostMapping("/forgotten-password")
-    public ResponseEntity<Map<String, String>> forgottenPassword(@Valid @RequestBody ForgetUserPasswordRequest request) {
+    public ResponseEntity<Map<String, String>> forgottenPassword(@Valid @RequestBody ForgottenPasswordRequest request) {
         String email = request.email().toLowerCase();
 
         resetTokenService.createAndSendResetEmail(userService.findByEmailOrThrow(email));
 
-        return ResponseEntityUtil.ok("An email has been sent to reset the password");
+        return ResponseEntityUtil.ok("Email de restablecimiento enviado correctamente");
     }
 
     @GetMapping("/check-reset-token")
@@ -45,21 +45,21 @@ public class ResetTokenApiController {
 
         resetTokenService.checkTokenAndUpdateIfExpired(resetTokenService.findByTokenOrThrow(token));
 
-        return ResponseEntityUtil.ok("Token is valid");
+        return ResponseEntityUtil.ok("Token válido");
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetUserPasswordRequest request) {
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         String token = request.token();
         String password = request.password();
         String confirmedPassword = request.confirmedPassword();
 
         if (!password.equals(confirmedPassword)) {
-            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The password and confirmed password do not match").get();
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden").get();
         }
 
         resetTokenService.updateUserAndUsed(resetTokenService.findByTokenOrThrow(token), password);
 
-        return ResponseEntityUtil.ok("Password successfully reset");
+        return ResponseEntityUtil.ok("Contraseña restablecida correctamente");
     }
 }
