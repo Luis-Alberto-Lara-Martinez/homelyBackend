@@ -1,14 +1,15 @@
 package org.educa.homelyBackend.services.common;
 
+import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -32,29 +33,28 @@ public class IaService {
                 .build();
     }
 
-    public String chat(String prompt) {
-        ObjectMapper mapper = new ObjectMapper();
-
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", model);
-        requestBody.put("messages", new Object[]{
-                Map.of("role", "user", "content", prompt)
-        });
-
-        String responseString = webClient.post()
+    public String chat(String message) {
+        JsonNode root = webClient.post()
                 .uri("/v1/chat/completions")
-                .bodyValue(requestBody)
+                .bodyValue(Map.of(
+                        "model", model,
+                        "messages", List.of(Map.of(
+                                "role", "user",
+                                "content", message
+                        ))
+                ))
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(JsonNode.class)
                 .block();
 
-        JsonNode root = mapper.readTree(responseString);
-        JsonNode contentNode = root
-                .path("choices")
-                .path(0)
-                .path("message")
-                .path("content");
+        if (root == null || !root.has("choices")) {
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "Fallo en la petición a Groq").get();
+        }
 
-        return contentNode.isString() ? contentNode.stringValue() : "";
+        return root.path("choices")
+                .get(0)
+                .path("message")
+                .path("content")
+                .asString();
     }
 }
