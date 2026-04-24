@@ -3,7 +3,6 @@ package org.educa.homelyBackend.services.common;
 import org.educa.homelyBackend.models.UserModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.Map;
 
