@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -94,4 +95,7 @@ public class UserModel {
 
     @OneToMany(mappedBy = "user")
     private Set<ResetTokenModel> resetTokens = new LinkedHashSet<>();
+
+    @ManyToMany(mappedBy = "users")
+    private Set<ConversationModel> conversations = new LinkedHashSet<>();
 }
