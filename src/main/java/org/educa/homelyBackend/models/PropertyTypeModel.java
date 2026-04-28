@@ -1,13 +1,10 @@
 package org.educa.homelyBackend.models;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -44,11 +41,6 @@ public class PropertyTypeModel {
     @OneToMany(mappedBy = "type")
     private Set<PropertyModel> properties = new LinkedHashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(
-            name = "property_extras_property_types",
-            joinColumns = @JoinColumn(name = "type_id"),
-            inverseJoinColumns = @JoinColumn(name = "extra_id")
-    )
+    @ManyToMany(mappedBy = "propertyTypes")
     private Set<PropertyExtraModel> propertyExtras = new LinkedHashSet<>();
 }

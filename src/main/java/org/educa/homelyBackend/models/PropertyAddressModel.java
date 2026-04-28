@@ -3,11 +3,10 @@ package org.educa.homelyBackend.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,7 +26,6 @@ import java.math.BigDecimal;
 @Table(
         name = "property_addresses",
         indexes = {
-                @Index(name = "uq_property_addresses_property_id", columnList = "property_id", unique = true),
                 @Index(name = "idx_property_addresses_city", columnList = "city"),
                 @Index(name = "idx_property_addresses_latitude_longitude", columnList = "latitude, longitude")
         }
@@ -35,10 +33,10 @@ import java.math.BigDecimal;
 public class PropertyAddressModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "property_id", nullable = false)
     private Integer id;
 
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "property_id", nullable = false)

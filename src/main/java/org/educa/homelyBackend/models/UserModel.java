@@ -87,15 +87,24 @@ public class UserModel {
     @JoinColumn(name = "updated_by")
     private UserModel updatedBy;
 
+    @ManyToMany(mappedBy = "users")
+    private Set<ConversationModel> conversations = new LinkedHashSet<>();
+
     @OneToMany(mappedBy = "user")
     private Set<FavouriteModel> favourites = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<PropertyModel> properties = new LinkedHashSet<>();
+    private Set<PropertyModel> propertiesCreatedBy = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "updatedBy")
+    private Set<PropertyModel> propertiesUpdatedBy = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<ResetTokenModel> resetTokens = new LinkedHashSet<>();
 
-    @ManyToMany(mappedBy = "users")
-    private Set<ConversationModel> conversations = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "createdBy")
+    private Set<UserModel> usersCreatedBy = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "updatedBy")
+    private Set<UserModel> usersUpdatedBy = new LinkedHashSet<>();
 }

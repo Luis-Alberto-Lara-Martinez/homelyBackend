@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -43,10 +45,15 @@ import java.util.Set;
                 @Index(name = "idx_properties_status_transaction_price", columnList = "status_id, transaction_id, type_id"),
                 @Index(name = "idx_properties_id_status", columnList = "status_id"),
                 @Index(name = "idx_properties_id_transaction",
-                        columnList = "transaction_id")
-        },
+                        columnList = "transaction_id")},
         uniqueConstraints = {
-                @UniqueConstraint(name = "uq_property_type", columnNames = {"id", "type_id"})
+                @UniqueConstraint(
+                        name = "uq_property_type",
+                        columnNames = {
+                                "id",
+                                "type_id"
+                        }
+                )
         }
 )
 public class PropertyModel {
@@ -102,6 +109,15 @@ public class PropertyModel {
 
     @OneToOne(mappedBy = "property")
     private EnergyCertificateModel energyCertificate;
+
+    @OneToMany(mappedBy = "property")
+    private Set<FavouriteModel> favourites = new LinkedHashSet<>();
+
+    @ManyToMany(mappedBy = "properties")
+    private Set<PropertyExtraModel> propertyExtras = new LinkedHashSet<>();
+
+    @OneToOne(mappedBy = "property")
+    private PropertyAddressModel propertyAddress;
 
     @OneToMany(mappedBy = "property")
     private Set<PropertyImageModel> propertyImages = new LinkedHashSet<>();

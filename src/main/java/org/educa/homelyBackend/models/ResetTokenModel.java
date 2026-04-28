@@ -30,8 +30,7 @@ import java.time.Instant;
         name = "reset_tokens",
         indexes = {
                 @Index(name = "idx_reset_tokens_user_id", columnList = "user_id"),
-                @Index(name = "idx_reset_tokens_expiration_used", columnList = "expiration, used")
-        },
+                @Index(name = "idx_reset_tokens_expiration_used", columnList = "expiration, used")},
         uniqueConstraints = {
                 @UniqueConstraint(name = "reset_tokens_hashed_token_key", columnNames = {"hashed_token"})
         }

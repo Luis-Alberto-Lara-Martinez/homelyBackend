@@ -30,8 +30,7 @@ import java.time.Instant;
 @Table(
         name = "property_images",
         indexes = {
-                @Index(name = "idx_property_images_property_display_order", columnList = "property_id, display_order"),
-                @Index(name = "idx_property_images_id_property", columnList = "property_id")
+                @Index(name = "idx_property_images_property_display_order", columnList = "property_id, display_order")
         }
 )
 public class PropertyImageModel {

@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -37,6 +39,19 @@ public class PropertyExtraModel {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @ManyToMany(mappedBy = "propertyExtras")
+    @ManyToMany
+    @JoinTable(
+            name = "properties_property_extras",
+            joinColumns = @JoinColumn(name = "extra_id"),
+            inverseJoinColumns = @JoinColumn(name = "property_id")
+    )
+    private Set<PropertyModel> properties = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "property_extras_property_types",
+            joinColumns = @JoinColumn(name = "extra_id"),
+            inverseJoinColumns = @JoinColumn(name = "type_id")
+    )
     private Set<PropertyTypeModel> propertyTypes = new LinkedHashSet<>();
 }

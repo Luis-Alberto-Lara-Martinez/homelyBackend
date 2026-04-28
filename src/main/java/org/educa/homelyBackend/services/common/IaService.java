@@ -15,8 +15,6 @@ import java.util.Map;
 @Service
 public class IaService {
 
-    // TODO: Revisar el servicio
-
     private final WebClient webClient;
     private final String model;
 
@@ -34,13 +32,26 @@ public class IaService {
     }
 
     public String chat(String message) {
+        String prompt = """
+                Debes devolver un único json sin absolutamente nada más de texto salvo el json,
+                con la siguiente estructura en función del message recibido:
+                {
+                    "type": "residence",
+                    "title": "Título de la tarea o recordatorio",
+                    "description": "Descripción de la tarea",
+                    "dueDate": "Fecha de vencimiento en formato ISO 8601",
+                    "priority": "Baja, Media o Alta"
+                }
+                message: %s
+                """.formatted(message);
+
         JsonNode root = webClient.post()
                 .uri("/v1/chat/completions")
                 .bodyValue(Map.of(
                         "model", model,
                         "messages", List.of(Map.of(
                                 "role", "user",
-                                "content", message
+                                "content", prompt
                         ))
                 ))
                 .retrieve()

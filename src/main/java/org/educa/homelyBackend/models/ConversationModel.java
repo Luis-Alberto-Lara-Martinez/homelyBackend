@@ -1,6 +1,5 @@
 package org.educa.homelyBackend.models;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -49,7 +48,7 @@ public class ConversationModel {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany
     @JoinTable(
             name = "conversations_users",
             joinColumns = @JoinColumn(name = "conversation_id"),
@@ -57,7 +56,6 @@ public class ConversationModel {
     )
     private Set<UserModel> users = new LinkedHashSet<>();
 
-    @OneToMany
-    @JoinColumn(name = "conversation_id")
+    @OneToMany(mappedBy = "conversation")
     private Set<MessageModel> messages = new LinkedHashSet<>();
 }

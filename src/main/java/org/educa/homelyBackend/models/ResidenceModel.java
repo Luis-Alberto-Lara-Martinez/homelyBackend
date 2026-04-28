@@ -3,11 +3,10 @@ package org.educa.homelyBackend.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,7 +24,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(
         name = "residences",
         indexes = {
-                @Index(name = "idx_residences_id_property", columnList = "property_id", unique = true),
                 @Index(name = "idx_residences_bedrooms", columnList = "bedrooms"),
                 @Index(name = "idx_residences_bathrooms", columnList = "bathrooms")
         }
@@ -33,10 +31,10 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ResidenceModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "property_id", nullable = false)
     private Integer id;
 
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "property_id", nullable = false)
