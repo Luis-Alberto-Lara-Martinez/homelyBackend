@@ -42,13 +42,7 @@ public class ResendService {
     private void sendEmail(
             String to, String subject, String name, String templateName, Map<String, Object> extraVariables
     ) {
-        Context context = new Context();
-        context.setVariable("name", name);
-        context.setVariable("year", Year.now().getValue());
-
-        if (extraVariables != null && !extraVariables.isEmpty()) {
-            context.setVariables(extraVariables);
-        }
+        Context context = createContext(name, extraVariables);
 
         String html = templateEngine.process(templateName, context);
 
@@ -65,5 +59,17 @@ public class ResendService {
         } catch (ResendException e) {
             throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error de Resend al enviar un correo electrónico a " + to);
         }
+    }
+
+    private Context createContext(String name, Map<String, Object> extraVariables) {
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("year", Year.now().getValue());
+
+        if (extraVariables != null && !extraVariables.isEmpty()) {
+            context.setVariables(extraVariables);
+        }
+
+        return context;
     }
 }

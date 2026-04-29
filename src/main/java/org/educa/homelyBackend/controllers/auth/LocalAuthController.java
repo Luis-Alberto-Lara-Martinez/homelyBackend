@@ -1,6 +1,7 @@
 package org.educa.homelyBackend.controllers.auth;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.request.LocalLogInRequest;
 import org.educa.homelyBackend.dtos.request.LocalRegisterRequest;
 import org.educa.homelyBackend.models.UserModel;
@@ -18,15 +19,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/local")
+@RequiredArgsConstructor
 public class LocalAuthController {
 
     private final UserService userService;
     private final LogInService logInService;
-
-    public LocalAuthController(UserService userService, LogInService logInService) {
-        this.userService = userService;
-        this.logInService = logInService;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> localLogIn(@Valid @RequestBody LocalLogInRequest request) {

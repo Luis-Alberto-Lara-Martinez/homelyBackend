@@ -1,11 +1,12 @@
 package org.educa.homelyBackend.services.dedicated;
 
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.common.AvatarService;
 import org.educa.homelyBackend.services.common.CloudinaryService;
+import org.educa.homelyBackend.services.common.PasswordEncoderService;
 import org.educa.homelyBackend.services.common.ResendService;
-import org.educa.homelyBackend.services.common.EncoderService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserDao userDao;
@@ -26,17 +28,7 @@ public class UserService {
     private final ResendService resendService;
     private final CloudinaryService cloudinaryService;
     private final AvatarService avatarService;
-    private final EncoderService encoderService;
-
-    public UserService(UserDao userDao, UserRoleService userRoleService, UserStatusService userStatusService, ResendService resendService, CloudinaryService cloudinaryService, AvatarService avatarService, EncoderService encoderService) {
-        this.userDao = userDao;
-        this.userRoleService = userRoleService;
-        this.userStatusService = userStatusService;
-        this.resendService = resendService;
-        this.cloudinaryService = cloudinaryService;
-        this.avatarService = avatarService;
-        this.encoderService = encoderService;
-    }
+    private final PasswordEncoderService passwordEncoderService;
 
     public Page<UserModel> findAll(Integer page, Integer size) {
         return findAll(page, size, null);
@@ -89,7 +81,7 @@ public class UserService {
         user.setEmail(email);
 
         if (password != null && !password.isBlank()) {
-            user.setHashedPassword(encoderService.generateHashedPassword(password));
+            user.setHashedPassword(passwordEncoderService.generateHashedPassword(password));
         }
 
         user = saveOrUpdate(user);
@@ -104,17 +96,17 @@ public class UserService {
 
     public void updateHashedPassword(String email, String password) {
         UserModel user = findByEmailOrThrow(email);
-        user.setHashedPassword(encoderService.generateHashedPassword(password));
+        user.setHashedPassword(passwordEncoderService.generateHashedPassword(password));
         saveOrUpdate(user);
     }
 
     public void updateHashedPassword(UserModel user, String password) {
-        user.setHashedPassword(encoderService.generateHashedPassword(password));
+        user.setHashedPassword(passwordEncoderService.generateHashedPassword(password));
         saveOrUpdate(user);
     }
 
     public void checkHashedPassword(String password, String hashedPassword) {
-        if (!encoderService.checkHashedPassword(password, hashedPassword)) {
+        if (!passwordEncoderService.checkHashedPassword(password, hashedPassword)) {
             throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The password is incorrect").get();
         }
     }

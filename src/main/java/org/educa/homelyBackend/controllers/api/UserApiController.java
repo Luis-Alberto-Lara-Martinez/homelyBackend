@@ -1,6 +1,7 @@
 package org.educa.homelyBackend.controllers.api;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.request.UpdateUserNameRequest;
 import org.educa.homelyBackend.dtos.request.UpdateUserPasswordRequest;
 import org.educa.homelyBackend.models.UserModel;
@@ -22,13 +23,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
+@RequiredArgsConstructor
 public class UserApiController {
 
     private final UserService userService;
-
-    public UserApiController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/")
     public ResponseEntity<Map<String, String>> findUserProfile(@AuthenticationPrincipal Jwt jwt) {

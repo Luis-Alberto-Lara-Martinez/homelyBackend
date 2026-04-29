@@ -1,5 +1,6 @@
 package org.educa.homelyBackend.services.dedicated;
 
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.MessageDao;
 import org.educa.homelyBackend.models.MessageModel;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -7,17 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class MessageService {
 
     private final MessageDao messageDao;
     private final SimpMessagingTemplate messagingTemplate;
     private final ConversationService conversationService;
-
-    public MessageService(MessageDao messageDao, SimpMessagingTemplate messagingTemplate, ConversationService conversationService) {
-        this.messageDao = messageDao;
-        this.messagingTemplate = messagingTemplate;
-        this.conversationService = conversationService;
-    }
 
     @Transactional(rollbackFor = Exception.class)
     public void saveAndBroadcast(Integer conversationId, String content) {

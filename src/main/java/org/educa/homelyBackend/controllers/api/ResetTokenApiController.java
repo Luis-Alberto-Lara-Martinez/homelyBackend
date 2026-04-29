@@ -1,6 +1,7 @@
 package org.educa.homelyBackend.controllers.api;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.request.CheckResetTokenRequest;
 import org.educa.homelyBackend.dtos.request.ForgottenPasswordRequest;
 import org.educa.homelyBackend.dtos.request.ResetPasswordRequest;
@@ -20,15 +21,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ResetTokenApiController {
 
     private final ResetTokenService resetTokenService;
     private final UserService userService;
-
-    public ResetTokenApiController(ResetTokenService resetTokenService, UserService userService) {
-        this.resetTokenService = resetTokenService;
-        this.userService = userService;
-    }
 
     @PostMapping("/forgotten-password")
     public ResponseEntity<Map<String, String>> forgottenPassword(@Valid @RequestBody ForgottenPasswordRequest request) {

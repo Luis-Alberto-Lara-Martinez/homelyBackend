@@ -1,10 +1,11 @@
 package org.educa.homelyBackend.services.dedicated;
 
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.ResetTokenDao;
 import org.educa.homelyBackend.models.ResetTokenModel;
 import org.educa.homelyBackend.models.UserModel;
+import org.educa.homelyBackend.services.common.RandomTokenService;
 import org.educa.homelyBackend.services.common.ResendService;
-import org.educa.homelyBackend.services.common.EncoderService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,24 +15,18 @@ import java.time.Duration;
 import java.time.Instant;
 
 @Service
+@RequiredArgsConstructor
 public class ResetTokenService {
 
     private static final Integer EXPIRATION_MINUTES = 20;
 
     private final ResetTokenDao resetTokenDao;
-    private final EncoderService encoderService;
+    private final RandomTokenService randomTokenService;
     private final ResendService resendService;
     private final UserService userService;
 
-    public ResetTokenService(ResetTokenDao resetTokenDao, EncoderService encoderService, ResendService resendService, UserService userService) {
-        this.resetTokenDao = resetTokenDao;
-        this.encoderService = encoderService;
-        this.resendService = resendService;
-        this.userService = userService;
-    }
-
     public ResetTokenModel findByTokenOrThrow(String token) {
-        return resetTokenDao.findByHashedToken(encoderService.generateHashedToken(token))
+        return resetTokenDao.findByHashedToken(randomTokenService.generateHashedToken(token))
                 .orElseThrow(() -> ExceptionUtil.manageException(
                         HttpStatus.NOT_FOUND,
                         "No se encontró ningún token de restablecimiento de contraseña válido para el token proporcionado"
@@ -56,11 +51,11 @@ public class ResetTokenService {
 
     @Transactional(rollbackFor = Exception.class)
     public void createAndSendResetEmail(UserModel user) {
-        String token = encoderService.generateSecureRandomToken();
+        String token = randomTokenService.generateSecureRandomToken();
 
         ResetTokenModel resetTokenModel = new ResetTokenModel();
         resetTokenModel.setUser(user);
-        resetTokenModel.setHashedToken(encoderService.generateHashedToken(token));
+        resetTokenModel.setHashedToken(randomTokenService.generateHashedToken(token));
         resetTokenModel.setExpiration(Instant.now().plus(Duration.ofMinutes(EXPIRATION_MINUTES)));
 
         resetTokenModel = saveOrUpdate(resetTokenModel);

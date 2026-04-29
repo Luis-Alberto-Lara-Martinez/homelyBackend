@@ -1,5 +1,6 @@
 package org.educa.homelyBackend.services.dedicated;
 
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserStatusDao;
 import org.educa.homelyBackend.models.UserStatusModel;
 import org.educa.homelyBackend.utils.ExceptionUtil;
@@ -9,13 +10,10 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserStatusService {
 
     private final UserStatusDao userStatusDao;
-
-    public UserStatusService(UserStatusDao userStatusDao) {
-        this.userStatusDao = userStatusDao;
-    }
 
     private Optional<UserStatusModel> findByName(String name) {
         return userStatusDao.findByName(name);

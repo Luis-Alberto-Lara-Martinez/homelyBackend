@@ -1,5 +1,6 @@
 package org.educa.homelyBackend.controllers.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.services.common.LogInService;
 import org.educa.homelyBackend.services.dedicated.UserService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
@@ -15,15 +16,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/oauth2")
+@RequiredArgsConstructor
 public class Oauth2Controller {
 
     private final UserService userService;
     private final LogInService logInService;
-
-    public Oauth2Controller(UserService userService, LogInService logInService) {
-        this.userService = userService;
-        this.logInService = logInService;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> oauth2LogIn(@AuthenticationPrincipal Jwt jwt) {
