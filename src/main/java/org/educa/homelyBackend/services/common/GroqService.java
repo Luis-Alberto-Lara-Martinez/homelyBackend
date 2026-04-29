@@ -1,10 +1,11 @@
 package org.educa.homelyBackend.services.common;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.configurations.GroqConfiguration;
+import org.educa.homelyBackend.properties.GroqProperties;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.JsonNode;
 
 import java.util.List;
@@ -14,7 +15,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GroqService {
 
-    private final GroqConfiguration groqConfiguration;
+    private final WebClient webClient;
+    private final GroqProperties groqProperties;
 
     public String chat(String message) {
         String prompt = """
@@ -30,10 +32,10 @@ public class GroqService {
                 message: %s
                 """.formatted(message);
 
-        JsonNode root = groqConfiguration.getGroqWebClient().post()
+        JsonNode root = webClient.post()
                 .uri("/v1/chat/completions")
                 .bodyValue(Map.of(
-                        "model", groqConfiguration.getGroqModel(),
+                        "model", groqProperties.model(),
                         "messages", List.of(Map.of(
                                 "role", "user",
                                 "content", prompt
