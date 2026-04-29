@@ -1,6 +1,7 @@
 package org.educa.homelyBackend.services.common;
 
 import com.cloudinary.Cloudinary;
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class CloudinaryService {
 
     private static final String BASE_DIRECTORY = "homely";
@@ -17,10 +19,6 @@ public class CloudinaryService {
     private static final String PROPERTIES_DIRECTORY = BASE_DIRECTORY + "/properties";
 
     private final Cloudinary cloudinary;
-
-    public CloudinaryService(Cloudinary cloudinary) {
-        this.cloudinary = cloudinary;
-    }
 
     public String uploadAvatarImage(MultipartFile avatarImageFile, Integer userId) {
         String fileName = String.valueOf(userId);

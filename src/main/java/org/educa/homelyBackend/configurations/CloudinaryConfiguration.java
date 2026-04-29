@@ -1,40 +1,25 @@
 package org.educa.homelyBackend.configurations;
 
 import com.cloudinary.Cloudinary;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.educa.homelyBackend.properties.CloudinaryProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
 @Configuration
+@RequiredArgsConstructor
 public class CloudinaryConfiguration {
 
-    private final String cloudName;
-    private final String apiKey;
-    private final String apiSecret;
-
-    public CloudinaryConfiguration(
-            @Value("${cloudinary.cloud.name}")
-            String cloudName,
-
-            @Value("${cloudinary.api.key}")
-            String apiKey,
-
-            @Value("${cloudinary.api.secret}")
-            String apiSecret
-    ) {
-        this.cloudName = cloudName;
-        this.apiKey = apiKey;
-        this.apiSecret = apiSecret;
-    }
+    private final CloudinaryProperties cloudinaryProperties;
 
     @Bean
     public Cloudinary cloudinary() {
         return new Cloudinary(Map.of(
-                "cloud_name", cloudName,
-                "api_key", apiKey,
-                "api_secret", apiSecret,
+                "cloud_name", cloudinaryProperties.cloudName(),
+                "api_key", cloudinaryProperties.apiKey(),
+                "api_secret", cloudinaryProperties.apiSecret(),
                 "secure", true
         ));
     }
