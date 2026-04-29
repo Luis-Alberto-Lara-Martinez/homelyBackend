@@ -1,35 +1,20 @@
 package org.educa.homelyBackend.services.common;
 
+import lombok.RequiredArgsConstructor;
+import org.educa.homelyBackend.configurations.GroqConfiguration;
 import org.educa.homelyBackend.utils.ExceptionUtil;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.JsonNode;
 
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class IaService {
+@RequiredArgsConstructor
+public class GroqService {
 
-    private final WebClient webClient;
-    private final String model;
-
-    public IaService(
-            @Value("${groq.api.key}") String apiKey,
-            @Value("${groq.base.url}") String baseUrl,
-            @Value("${groq.model}") String model
-    ) {
-        this.model = model;
-        this.webClient = WebClient.builder()
-                .baseUrl(baseUrl)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-    }
+    private final GroqConfiguration groqConfiguration;
 
     public String chat(String message) {
         String prompt = """
@@ -45,10 +30,10 @@ public class IaService {
                 message: %s
                 """.formatted(message);
 
-        JsonNode root = webClient.post()
+        JsonNode root = groqConfiguration.getGroqWebClient().post()
                 .uri("/v1/chat/completions")
                 .bodyValue(Map.of(
-                        "model", model,
+                        "model", groqConfiguration.getGroqModel(),
                         "messages", List.of(Map.of(
                                 "role", "user",
                                 "content", prompt
