@@ -4,7 +4,7 @@ import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.common.AvatarService;
 import org.educa.homelyBackend.services.common.CloudinaryService;
-import org.educa.homelyBackend.services.common.EmailService;
+import org.educa.homelyBackend.services.common.ResendService;
 import org.educa.homelyBackend.services.common.EncoderService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.data.domain.Page;
@@ -23,16 +23,16 @@ public class UserService {
     private final UserDao userDao;
     private final UserRoleService userRoleService;
     private final UserStatusService userStatusService;
-    private final EmailService emailService;
+    private final ResendService resendService;
     private final CloudinaryService cloudinaryService;
     private final AvatarService avatarService;
     private final EncoderService encoderService;
 
-    public UserService(UserDao userDao, UserRoleService userRoleService, UserStatusService userStatusService, EmailService emailService, CloudinaryService cloudinaryService, AvatarService avatarService, EncoderService encoderService) {
+    public UserService(UserDao userDao, UserRoleService userRoleService, UserStatusService userStatusService, ResendService resendService, CloudinaryService cloudinaryService, AvatarService avatarService, EncoderService encoderService) {
         this.userDao = userDao;
         this.userRoleService = userRoleService;
         this.userStatusService = userStatusService;
-        this.emailService = emailService;
+        this.resendService = resendService;
         this.cloudinaryService = cloudinaryService;
         this.avatarService = avatarService;
         this.encoderService = encoderService;
@@ -97,7 +97,7 @@ public class UserService {
         String imageUrl = cloudinaryService.uploadAvatarImage(avatarService.generateAvatar(name), user.getId());
         user.setImageUrl(imageUrl);
 
-        emailService.sendWelcomeEmail(email, name);
+        resendService.sendWelcomeEmail(email, name);
 
         return saveOrUpdate(user);
     }

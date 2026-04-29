@@ -3,9 +3,9 @@ package org.educa.homelyBackend.services.common;
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
+import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.jsoup.Jsoup;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -15,18 +15,14 @@ import java.time.Year;
 import java.util.Map;
 
 @Service
-public class EmailService {
+@RequiredArgsConstructor
+public class ResendService {
 
     private static final String FROM_EMAIL = "Homely <comunications@homelyweb.app>";
     private static final String BASE_FRONTEND_URL = "https://homelyweb.app";
 
     private final Resend resend;
     private final TemplateEngine templateEngine;
-
-    public EmailService(@Value("${resend.api.key}") String apiKey, TemplateEngine templateEngine) {
-        this.resend = new Resend(apiKey);
-        this.templateEngine = templateEngine;
-    }
 
     public void sendWelcomeEmail(String to, String name) {
         sendEmail(to, "¡Bienvenido a Homely, " + name, name, "welcome", null);

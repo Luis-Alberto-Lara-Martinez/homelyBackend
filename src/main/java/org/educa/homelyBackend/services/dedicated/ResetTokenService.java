@@ -3,7 +3,7 @@ package org.educa.homelyBackend.services.dedicated;
 import org.educa.homelyBackend.daos.ResetTokenDao;
 import org.educa.homelyBackend.models.ResetTokenModel;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.common.EmailService;
+import org.educa.homelyBackend.services.common.ResendService;
 import org.educa.homelyBackend.services.common.EncoderService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
@@ -20,13 +20,13 @@ public class ResetTokenService {
 
     private final ResetTokenDao resetTokenDao;
     private final EncoderService encoderService;
-    private final EmailService emailService;
+    private final ResendService resendService;
     private final UserService userService;
 
-    public ResetTokenService(ResetTokenDao resetTokenDao, EncoderService encoderService, EmailService emailService, UserService userService) {
+    public ResetTokenService(ResetTokenDao resetTokenDao, EncoderService encoderService, ResendService resendService, UserService userService) {
         this.resetTokenDao = resetTokenDao;
         this.encoderService = encoderService;
-        this.emailService = emailService;
+        this.resendService = resendService;
         this.userService = userService;
     }
 
@@ -65,7 +65,7 @@ public class ResetTokenService {
 
         resetTokenModel = saveOrUpdate(resetTokenModel);
 
-        emailService.sendResetPasswordEmail(
+        resendService.sendResetPasswordEmail(
                 resetTokenModel.getUser().getEmail(),
                 resetTokenModel.getUser().getName(),
                 EXPIRATION_MINUTES,
