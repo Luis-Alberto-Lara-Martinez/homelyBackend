@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.ResetTokenDao;
 import org.educa.homelyBackend.models.ResetTokenModel;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.shared.RandomTokenService;
+import org.educa.homelyBackend.services.shared.impl.RandomTokenServiceImpl;
 import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
@@ -21,12 +21,12 @@ public class ResetTokenService {
     private static final Integer EXPIRATION_MINUTES = 20;
 
     private final ResetTokenDao resetTokenDao;
-    private final RandomTokenService randomTokenService;
+    private final RandomTokenServiceImpl randomTokenServiceImpl;
     private final ResendService resendService;
     private final UserService userService;
 
     public ResetTokenModel findByTokenOrThrow(String token) {
-        return resetTokenDao.findByHashedToken(randomTokenService.generateHashedRandomToken(token))
+        return resetTokenDao.findByHashedToken(randomTokenServiceImpl.generateHashedRandomToken(token))
                 .orElseThrow(() -> ExceptionUtil.manageException(
                         HttpStatus.NOT_FOUND,
                         "No se encontró ningún token de restablecimiento de contraseña válido para el token proporcionado"
@@ -51,11 +51,11 @@ public class ResetTokenService {
 
     @Transactional(rollbackFor = Exception.class)
     public void createAndSendResetEmail(UserModel user) {
-        String token = randomTokenService.generateRandomToken();
+        String token = randomTokenServiceImpl.generateRandomToken();
 
         ResetTokenModel resetTokenModel = new ResetTokenModel();
         resetTokenModel.setUser(user);
-        resetTokenModel.setHashedToken(randomTokenService.generateHashedRandomToken(token));
+        resetTokenModel.setHashedToken(randomTokenServiceImpl.generateHashedRandomToken(token));
         resetTokenModel.setExpiration(Instant.now().plus(Duration.ofMinutes(EXPIRATION_MINUTES)));
 
         resetTokenModel = saveOrUpdate(resetTokenModel);
