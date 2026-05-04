@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.services.common;
+package org.educa.homelyBackend.services.shared;
 
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;

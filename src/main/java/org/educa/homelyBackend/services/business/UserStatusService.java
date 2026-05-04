@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.services.dedicated;
+package org.educa.homelyBackend.services.business;
 
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserStatusDao;

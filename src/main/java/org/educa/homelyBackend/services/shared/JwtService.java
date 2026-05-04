@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.services.common;
+package org.educa.homelyBackend.services.shared;
 
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;

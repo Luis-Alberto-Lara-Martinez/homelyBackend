@@ -2,7 +2,7 @@ package org.educa.homelyBackend.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.common.JwtService;
+import org.educa.homelyBackend.services.shared.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 

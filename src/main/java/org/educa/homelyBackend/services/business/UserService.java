@@ -1,12 +1,12 @@
-package org.educa.homelyBackend.services.dedicated;
+package org.educa.homelyBackend.services.business;
 
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.common.AvatarService;
-import org.educa.homelyBackend.services.common.CloudinaryService;
-import org.educa.homelyBackend.services.common.PasswordEncoderService;
-import org.educa.homelyBackend.services.common.ResendService;
+import org.educa.homelyBackend.services.shared.AvatarService;
+import org.educa.homelyBackend.services.shared.CloudinaryService;
+import org.educa.homelyBackend.services.shared.PasswordEncoderService;
+import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

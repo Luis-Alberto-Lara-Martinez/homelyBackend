@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.services.common;
+package org.educa.homelyBackend.services.shared;
 
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;

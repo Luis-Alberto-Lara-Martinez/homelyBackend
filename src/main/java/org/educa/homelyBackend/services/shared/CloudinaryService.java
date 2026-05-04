@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.services.common;
+package org.educa.homelyBackend.services.shared;
 
 import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;

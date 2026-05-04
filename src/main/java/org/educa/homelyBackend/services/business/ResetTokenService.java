@@ -1,11 +1,11 @@
-package org.educa.homelyBackend.services.dedicated;
+package org.educa.homelyBackend.services.business;
 
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.ResetTokenDao;
 import org.educa.homelyBackend.models.ResetTokenModel;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.common.RandomTokenService;
-import org.educa.homelyBackend.services.common.ResendService;
+import org.educa.homelyBackend.services.shared.RandomTokenService;
+import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

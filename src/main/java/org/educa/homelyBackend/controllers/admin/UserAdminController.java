@@ -1,7 +1,7 @@
 package org.educa.homelyBackend.controllers.admin;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.services.dedicated.UserService;
+import org.educa.homelyBackend.services.business.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

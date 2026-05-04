@@ -1,7 +1,7 @@
 package org.educa.homelyBackend.controllers.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.services.dedicated.UserService;
+import org.educa.homelyBackend.services.business.UserService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.educa.homelyBackend.utils.LogInUtil;
 import org.springframework.http.HttpStatus;

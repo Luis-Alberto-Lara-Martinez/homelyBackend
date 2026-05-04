@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.request.LocalLogInRequest;
 import org.educa.homelyBackend.dtos.request.LocalRegisterRequest;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.dedicated.UserService;
+import org.educa.homelyBackend.services.business.UserService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.educa.homelyBackend.utils.LogInUtil;
 import org.springframework.http.HttpStatus;
