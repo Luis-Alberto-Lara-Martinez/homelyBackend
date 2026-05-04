@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.shared.impl.AvatarServiceImpl;
-import org.educa.homelyBackend.services.shared.CloudinaryServiceImpl;
+import org.educa.homelyBackend.services.shared.impl.CloudinaryServiceImpl;
 import org.educa.homelyBackend.services.shared.PasswordEncoderService;
 import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;

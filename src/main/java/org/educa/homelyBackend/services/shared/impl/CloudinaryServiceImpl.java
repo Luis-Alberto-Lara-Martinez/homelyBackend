@@ -1,7 +1,8 @@
-package org.educa.homelyBackend.services.shared;
+package org.educa.homelyBackend.services.shared.impl;
 
 import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
+import org.educa.homelyBackend.services.shared.CloudinaryService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,40 +23,43 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
     @Override
     public String uploadAvatarImage(MultipartFile avatarImageFile, Integer userId) {
-        String fileName = String.valueOf(userId);
-        byte[] rawAvatarImageFile;
-
-        try {
-            rawAvatarImageFile = avatarImageFile.getBytes();
-        } catch (IOException e) {
-            throw ExceptionUtil.manageException(
-                    e,
-                    HttpStatus.BAD_REQUEST,
-                    "Error al leer el archivo de imagen del avatar para el usuario con ID " + userId
-            );
-        }
-
-        return uploadImage(rawAvatarImageFile, AVATARS_DIRECTORY, fileName);
+        return uploadImage(avatarImageFile, AVATARS_DIRECTORY, buildAvatarImageFileName(userId));
     }
 
     @Override
     public String uploadAvatarImage(byte[] rawAvatarImageFile, Integer userId) {
-        return uploadImage(rawAvatarImageFile, AVATARS_DIRECTORY, String.valueOf(userId));
+        return uploadImage(rawAvatarImageFile, AVATARS_DIRECTORY, buildAvatarImageFileName(userId));
     }
 
     @Override
     public String uploadPropertyImage(MultipartFile propertyImageFile, Integer propertyId, Integer propertyImageOrder) {
-        return "";
+        return uploadImage(
+                propertyImageFile, PROPERTIES_DIRECTORY, buildPropertyImageFileName(propertyId, propertyImageOrder)
+        );
     }
 
     @Override
     public void deleteAvatarImage(Integer userId) {
-        deleteImage(AVATARS_DIRECTORY + "/" + userId);
+        deleteImage(AVATARS_DIRECTORY + "/" + buildAvatarImageFileName(userId));
     }
 
     @Override
     public void deletePropertyImage(Integer propertyId, Integer propertyImageOrder) {
-        deleteImage(PROPERTIES_DIRECTORY + "/" + propertyId + "-" + propertyImageOrder);
+        deleteImage(PROPERTIES_DIRECTORY + "/" + buildPropertyImageFileName(propertyId, propertyImageOrder));
+    }
+
+    private String uploadImage(MultipartFile imageFile, String folder, String fileName) {
+        byte[] rawImageFile;
+
+        try {
+            rawImageFile = imageFile.getBytes();
+        } catch (IOException e) {
+            throw ExceptionUtil.manageException(
+                    e, HttpStatus.BAD_REQUEST, "Error al subir la imagen a %s/%s".formatted(folder, fileName)
+            );
+        }
+
+        return uploadImage(rawImageFile, folder, fileName);
     }
 
     private String uploadImage(byte[] rawImageFile, String folder, String fileName) {
@@ -63,12 +67,14 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             return cloudinary.uploader()
                     .upload(rawImageFile, Map.of(
                             "folder", folder,
-                            "public_id", fileName)
-                    )
+                            "public_id", fileName
+                    ))
                     .get("secure_url")
                     .toString();
         } catch (IOException e) {
-            throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error al subir la imagen " + fileName);
+            throw ExceptionUtil.manageException(
+                    e, HttpStatus.BAD_REQUEST, "Error al subir la imagen a %s/%s".formatted(folder, fileName)
+            );
         }
     }
 
@@ -78,5 +84,13 @@ public class CloudinaryServiceImpl implements CloudinaryService {
         } catch (IOException e) {
             throw ExceptionUtil.manageException(e, HttpStatus.BAD_REQUEST, "Error al eliminar la imagen " + publicId);
         }
+    }
+
+    private String buildAvatarImageFileName(Integer userId) {
+        return String.valueOf(userId);
+    }
+
+    private String buildPropertyImageFileName(Integer propertyId, Integer propertyImageOrder) {
+        return propertyId + "-" + propertyImageOrder;
     }
 }
