@@ -6,7 +6,7 @@ import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.shared.impl.AvatarServiceImpl;
 import org.educa.homelyBackend.services.shared.impl.CloudinaryServiceImpl;
 import org.educa.homelyBackend.services.shared.impl.PasswordEncoderServiceImpl;
-import org.educa.homelyBackend.services.shared.ResendService;
+import org.educa.homelyBackend.services.shared.impl.ResendServiceImpl;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +25,7 @@ public class UserService {
     private final UserDao userDao;
     private final UserRoleService userRoleService;
     private final UserStatusService userStatusService;
-    private final ResendService resendService;
+    private final ResendServiceImpl resendServiceImpl;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final AvatarServiceImpl avatarServiceImpl;
     private final PasswordEncoderServiceImpl passwordEncoderServiceImpl;
@@ -89,7 +89,7 @@ public class UserService {
         String imageUrl = cloudinaryServiceImpl.uploadAvatarImage(avatarServiceImpl.generateAvatar(name), user.getId());
         user.setImageUrl(imageUrl);
 
-        resendService.sendWelcomeEmail(email, name);
+        resendServiceImpl.sendWelcomeEmail(email, name);
 
         return saveOrUpdate(user);
     }

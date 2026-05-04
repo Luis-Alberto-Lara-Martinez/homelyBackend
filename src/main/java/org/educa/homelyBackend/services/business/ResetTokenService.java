@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.ResetTokenDao;
 import org.educa.homelyBackend.models.ResetTokenModel;
 import org.educa.homelyBackend.models.UserModel;
+import org.educa.homelyBackend.services.shared.impl.ResendServiceImpl;
 import org.educa.homelyBackend.services.shared.impl.RandomTokenServiceImpl;
-import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class ResetTokenService {
 
     private final ResetTokenDao resetTokenDao;
     private final RandomTokenServiceImpl randomTokenServiceImpl;
-    private final ResendService resendService;
+    private final ResendServiceImpl resendServiceImpl;
     private final UserService userService;
 
     public ResetTokenModel findByTokenOrThrow(String token) {
@@ -60,11 +60,11 @@ public class ResetTokenService {
 
         resetTokenModel = saveOrUpdate(resetTokenModel);
 
-        resendService.sendResetPasswordEmail(
+        resendServiceImpl.sendResetPasswordEmail(
                 resetTokenModel.getUser().getEmail(),
                 resetTokenModel.getUser().getName(),
-                EXPIRATION_MINUTES,
-                token
+                token,
+                EXPIRATION_MINUTES
         );
     }
 
