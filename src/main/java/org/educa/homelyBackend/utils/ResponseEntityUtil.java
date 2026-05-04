@@ -1,5 +1,6 @@
 package org.educa.homelyBackend.utils;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
@@ -10,7 +11,7 @@ public class ResponseEntityUtil {
         return ResponseEntity.ok(Map.of("message", message));
     }
 
-    public static ResponseEntity<Map<String, String>> badRequest(String error) {
-        return ResponseEntity.badRequest().body(Map.of("error", error));
+    public static ResponseEntity<Map<String, String>> personalizedError(HttpStatusCode httpStatusCode, String error) {
+        return ResponseEntity.status(httpStatusCode).body(Map.of("error", error));
     }
 }
