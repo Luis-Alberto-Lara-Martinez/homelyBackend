@@ -3,6 +3,7 @@ package org.educa.homelyBackend.services.business;
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
+import org.educa.homelyBackend.services.business.impl.UserRoleServiceImpl;
 import org.educa.homelyBackend.services.business.impl.UserStatusServiceImpl;
 import org.educa.homelyBackend.services.shared.impl.AvatarServiceImpl;
 import org.educa.homelyBackend.services.shared.impl.CloudinaryServiceImpl;
@@ -24,7 +25,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserDao userDao;
-    private final UserRoleService userRoleService;
+    private final UserRoleServiceImpl userRoleServiceImpl;
     private final UserStatusServiceImpl userStatusServiceImpl;
     private final ResendServiceImpl resendServiceImpl;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
@@ -76,7 +77,7 @@ public class UserService {
         }
 
         UserModel user = new UserModel();
-        user.setRole(userRoleService.findByNameOrThrow("USER"));
+        user.setRole(userRoleServiceImpl.findByNameOrThrow("USER"));
         user.setStatus(userStatusServiceImpl.findByNameOrThrow("ACTIVE"));
         user.setName(name);
         user.setEmail(email);
