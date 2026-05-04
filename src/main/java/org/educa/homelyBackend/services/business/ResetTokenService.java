@@ -26,7 +26,7 @@ public class ResetTokenService {
     private final UserService userService;
 
     public ResetTokenModel findByTokenOrThrow(String token) {
-        return resetTokenDao.findByHashedToken(randomTokenService.generateHashedToken(token))
+        return resetTokenDao.findByHashedToken(randomTokenService.generateHashedRandomToken(token))
                 .orElseThrow(() -> ExceptionUtil.manageException(
                         HttpStatus.NOT_FOUND,
                         "No se encontró ningún token de restablecimiento de contraseña válido para el token proporcionado"
@@ -51,11 +51,11 @@ public class ResetTokenService {
 
     @Transactional(rollbackFor = Exception.class)
     public void createAndSendResetEmail(UserModel user) {
-        String token = randomTokenService.generateSecureRandomToken();
+        String token = randomTokenService.generateRandomToken();
 
         ResetTokenModel resetTokenModel = new ResetTokenModel();
         resetTokenModel.setUser(user);
-        resetTokenModel.setHashedToken(randomTokenService.generateHashedToken(token));
+        resetTokenModel.setHashedToken(randomTokenService.generateHashedRandomToken(token));
         resetTokenModel.setExpiration(Instant.now().plus(Duration.ofMinutes(EXPIRATION_MINUTES)));
 
         resetTokenModel = saveOrUpdate(resetTokenModel);

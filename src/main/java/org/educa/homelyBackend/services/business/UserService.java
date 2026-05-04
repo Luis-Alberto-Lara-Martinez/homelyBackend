@@ -5,7 +5,7 @@ import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.shared.impl.AvatarServiceImpl;
 import org.educa.homelyBackend.services.shared.impl.CloudinaryServiceImpl;
-import org.educa.homelyBackend.services.shared.PasswordEncoderService;
+import org.educa.homelyBackend.services.shared.impl.PasswordEncoderServiceImpl;
 import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ public class UserService {
     private final ResendService resendService;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final AvatarServiceImpl avatarServiceImpl;
-    private final PasswordEncoderService passwordEncoderService;
+    private final PasswordEncoderServiceImpl passwordEncoderServiceImpl;
 
     public Page<UserModel> findAll(Integer page, Integer size) {
         return findAll(page, size, null);
@@ -81,7 +81,7 @@ public class UserService {
         user.setEmail(email);
 
         if (password != null && !password.isBlank()) {
-            user.setHashedPassword(passwordEncoderService.generateHashedPassword(password));
+            user.setHashedPassword(passwordEncoderServiceImpl.generateHashedPassword(password));
         }
 
         user = saveOrUpdate(user);
@@ -96,17 +96,17 @@ public class UserService {
 
     public void updateHashedPassword(String email, String password) {
         UserModel user = findByEmailOrThrow(email);
-        user.setHashedPassword(passwordEncoderService.generateHashedPassword(password));
+        user.setHashedPassword(passwordEncoderServiceImpl.generateHashedPassword(password));
         saveOrUpdate(user);
     }
 
     public void updateHashedPassword(UserModel user, String password) {
-        user.setHashedPassword(passwordEncoderService.generateHashedPassword(password));
+        user.setHashedPassword(passwordEncoderServiceImpl.generateHashedPassword(password));
         saveOrUpdate(user);
     }
 
     public void checkHashedPassword(String password, String hashedPassword) {
-        if (!passwordEncoderService.checkHashedPassword(password, hashedPassword)) {
+        if (!passwordEncoderServiceImpl.checkHashedPassword(password, hashedPassword)) {
             throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The password is incorrect").get();
         }
     }
