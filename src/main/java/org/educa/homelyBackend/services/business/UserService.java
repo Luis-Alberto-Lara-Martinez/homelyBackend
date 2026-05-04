@@ -3,7 +3,7 @@ package org.educa.homelyBackend.services.business;
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.shared.AvatarService;
+import org.educa.homelyBackend.services.shared.impl.AvatarServiceImpl;
 import org.educa.homelyBackend.services.shared.CloudinaryService;
 import org.educa.homelyBackend.services.shared.PasswordEncoderService;
 import org.educa.homelyBackend.services.shared.ResendService;
@@ -27,7 +27,7 @@ public class UserService {
     private final UserStatusService userStatusService;
     private final ResendService resendService;
     private final CloudinaryService cloudinaryService;
-    private final AvatarService avatarService;
+    private final AvatarServiceImpl avatarServiceImpl;
     private final PasswordEncoderService passwordEncoderService;
 
     public Page<UserModel> findAll(Integer page, Integer size) {
@@ -86,7 +86,7 @@ public class UserService {
 
         user = saveOrUpdate(user);
 
-        String imageUrl = cloudinaryService.uploadAvatarImage(avatarService.generateAvatar(name), user.getId());
+        String imageUrl = cloudinaryService.uploadAvatarImage(avatarServiceImpl.generateAvatar(name), user.getId());
         user.setImageUrl(imageUrl);
 
         resendService.sendWelcomeEmail(email, name);
