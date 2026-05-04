@@ -1,9 +1,9 @@
 package org.educa.homelyBackend.controllers.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.services.common.LogInService;
 import org.educa.homelyBackend.services.dedicated.UserService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
+import org.educa.homelyBackend.utils.LogInUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class Oauth2Controller {
 
     private final UserService userService;
-    private final LogInService logInService;
+    private final LogInUtil logInUtil;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> oauth2LogIn(@AuthenticationPrincipal Jwt jwt) {
@@ -30,7 +30,7 @@ public class Oauth2Controller {
             throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The token does not contain the claim 'email'").get();
         }
 
-        return logInService.createLogInResponse(userService.findByEmailOrThrow(email));
+        return logInUtil.createResponse(userService.findByEmailOrThrow(email));
     }
 
     @PostMapping("/register")
@@ -46,6 +46,6 @@ public class Oauth2Controller {
             throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The token does not contain the claim 'name'").get();
         }
 
-        return logInService.createLogInResponse(userService.createAndSendWelcomeEmail(name, email));
+        return logInUtil.createResponse(userService.createAndSendWelcomeEmail(name, email));
     }
 }
