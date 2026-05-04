@@ -1,12 +1,11 @@
 package org.educa.homelyBackend.configurations;
 
+import org.educa.homelyBackend.properties.CorsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 public class CorsSourceConfiguration {
@@ -14,17 +13,11 @@ public class CorsSourceConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:4200", "https://homelyweb.app", "https://www.homelyweb.app"
-        ));
-        configuration.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
-        ));
-        configuration.setAllowedHeaders(List.of(
-                "Authorization", "Content-Type", "Accept"
-        ));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+        configuration.setAllowedOrigins(CorsProperties.ALLOWED_ORIGINS);
+        configuration.setAllowedMethods(CorsProperties.ALLOWED_METHODS);
+        configuration.setAllowedHeaders(CorsProperties.ALLOWED_HEADERS);
+        configuration.setAllowCredentials(CorsProperties.ALLOW_CREDENTIALS);
+        configuration.setMaxAge(CorsProperties.MAX_AGE);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

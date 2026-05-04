@@ -1,5 +1,7 @@
 package org.educa.homelyBackend.configurations;
 
+import lombok.RequiredArgsConstructor;
+import org.educa.homelyBackend.properties.WebSocketProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -8,20 +10,21 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
+
+    private final WebSocketProperties webSocketProperties;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // Los mensajes que van del servidor al cliente empiezan con /topic
-        registry.enableSimpleBroker("/topic");
-
-        // Los mensajes que van del cliente al servidor empiezan con /app
-        registry.setApplicationDestinationPrefixes("/app");
+        registry.enableSimpleBroker(webSocketProperties.topicPrefix());
+        registry.setApplicationDestinationPrefixes(webSocketProperties.appPrefix());
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // El punto de entrada para la conexión inicial (Handshake)
-        registry.addEndpoint("/websocket").withSockJS();
+        registry.addEndpoint(webSocketProperties.endpoint())
+                .setAllowedOrigins(WebSocketProperties.ALLOWED_ORIGINS)
+                .withSockJS();
     }
 }
