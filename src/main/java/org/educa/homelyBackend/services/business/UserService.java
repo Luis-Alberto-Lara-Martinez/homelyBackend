@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.shared.impl.AvatarServiceImpl;
-import org.educa.homelyBackend.services.shared.CloudinaryService;
+import org.educa.homelyBackend.services.shared.CloudinaryServiceImpl;
 import org.educa.homelyBackend.services.shared.PasswordEncoderService;
 import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
@@ -26,7 +26,7 @@ public class UserService {
     private final UserRoleService userRoleService;
     private final UserStatusService userStatusService;
     private final ResendService resendService;
-    private final CloudinaryService cloudinaryService;
+    private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final AvatarServiceImpl avatarServiceImpl;
     private final PasswordEncoderService passwordEncoderService;
 
@@ -86,7 +86,7 @@ public class UserService {
 
         user = saveOrUpdate(user);
 
-        String imageUrl = cloudinaryService.uploadAvatarImage(avatarServiceImpl.generateAvatar(name), user.getId());
+        String imageUrl = cloudinaryServiceImpl.uploadAvatarImage(avatarServiceImpl.generateAvatar(name), user.getId());
         user.setImageUrl(imageUrl);
 
         resendService.sendWelcomeEmail(email, name);
@@ -114,7 +114,7 @@ public class UserService {
     public String updateImage(String email, MultipartFile avatarFile) {
         UserModel user = findByEmailOrThrow(email);
 
-        user.setImageUrl(cloudinaryService.uploadAvatarImage(avatarFile, user.getId()));
+        user.setImageUrl(cloudinaryServiceImpl.uploadAvatarImage(avatarFile, user.getId()));
 
         return saveOrUpdate(user).getImageUrl();
     }
