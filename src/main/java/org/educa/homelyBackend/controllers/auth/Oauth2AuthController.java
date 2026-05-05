@@ -1,10 +1,7 @@
 package org.educa.homelyBackend.controllers.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.services.business.impl.UserServiceImpl;
-import org.educa.homelyBackend.utils.ExceptionUtil;
-import org.educa.homelyBackend.utils.LogInUtil;
-import org.springframework.http.HttpStatus;
+import org.educa.homelyBackend.facades.Oauth2Facade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,33 +16,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class Oauth2AuthController {
 
-    private final UserServiceImpl userServiceImpl;
-    private final LogInUtil logInUtil;
+    private final Oauth2Facade oauth2Facade;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> oauth2LogIn(@AuthenticationPrincipal Jwt jwt) {
-        String email = jwt.getClaim("email");
-
-        if (email == null) {
-            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The token does not contain the claim 'email'").get();
-        }
-
-        return logInUtil.createResponse(userServiceImpl.findByEmailOrThrow(email));
+        return oauth2Facade.oauth2LogIn(jwt);
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> oauth2Register(@AuthenticationPrincipal Jwt jwt) {
-        String email = jwt.getClaim("email");
-        String name = jwt.getClaim("name");
-
-        if (email == null) {
-            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The token does not contain the claim 'email'").get();
-        }
-
-        if (name == null) {
-            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The token does not contain the claim 'name'").get();
-        }
-
-        return logInUtil.createResponse(userServiceImpl.createAndSendWelcomeEmail(name, email));
+        return oauth2Facade.oauth2Register(jwt);
     }
 }
