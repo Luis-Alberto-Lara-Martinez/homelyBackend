@@ -1,7 +1,7 @@
 package org.educa.homelyBackend.controllers.chat;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.services.business.MessageServiceImpl;
+import org.educa.homelyBackend.services.business.impl.MessageServiceImpl;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;

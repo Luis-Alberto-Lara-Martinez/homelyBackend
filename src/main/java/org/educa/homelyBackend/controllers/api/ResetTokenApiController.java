@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.request.CheckResetTokenRequest;
 import org.educa.homelyBackend.dtos.request.ForgottenPasswordRequest;
 import org.educa.homelyBackend.dtos.request.ResetPasswordRequest;
-import org.educa.homelyBackend.services.business.ResetTokenServiceImpl;
+import org.educa.homelyBackend.services.business.impl.ResetTokenServiceImpl;
 import org.educa.homelyBackend.services.business.impl.UserServiceImpl;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.educa.homelyBackend.utils.ResponseEntityUtil;
