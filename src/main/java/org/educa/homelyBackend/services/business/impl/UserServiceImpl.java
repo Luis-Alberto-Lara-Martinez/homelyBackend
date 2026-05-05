@@ -3,7 +3,10 @@ package org.educa.homelyBackend.services.business.impl;
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.UserDao;
 import org.educa.homelyBackend.models.UserModel;
+import org.educa.homelyBackend.services.business.UserRoleService;
 import org.educa.homelyBackend.services.business.UserService;
+import org.educa.homelyBackend.services.business.UserStatusService;
+import org.educa.homelyBackend.services.shared.AvatarService;
 import org.educa.homelyBackend.services.shared.CloudinaryService;
 import org.educa.homelyBackend.services.shared.PasswordEncoderService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
@@ -23,6 +26,9 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final PasswordEncoderService passwordEncoderService;
     private final CloudinaryService cloudinaryService;
+    private final AvatarService avatarService;
+    private final UserRoleService userRoleService;
+    private final UserStatusService userStatusService;
 
     @Override
     public Page<UserModel> findAll(Integer pageNumber, Integer pageSize, String sortBy) {
@@ -61,25 +67,54 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel saveOrUpdate(UserModel user) {
+    public UserModel createUser(String email, String name, String password, String role, String status) {
+        if (findByEmail(email).isPresent()) {
+            throw ExceptionUtil.manageException(
+                    HttpStatus.BAD_REQUEST,
+                    "El correo electrónico ya está registrado"
+            ).get();
+        }
+
+        UserModel user = UserModel.builder()
+                .role(userRoleService.findByNameOrThrow(role))
+                .status(userStatusService.findByNameOrThrow(status))
+                .name(name)
+                .email(email)
+                .build();
+
+        if (password != null && !password.isBlank()) {
+            user = updateHashedPassword(user, password);
+        }
+
+        return save(updateImage(save(user), avatarService.generateAvatar(name)));
+    }
+
+    @Override
+    public UserModel save(UserModel user) {
         return userDao.save(user);
     }
 
     @Override
     public UserModel updateHashedPassword(UserModel user, String password) {
         user.setHashedPassword(passwordEncoderService.generateHashedPassword(password));
-        return saveOrUpdate(user);
+        return save(user);
     }
 
     @Override
     public UserModel updateImage(UserModel user, MultipartFile avatarFile) {
         user.setImageUrl(cloudinaryService.uploadAvatarImage(avatarFile, user.getId()));
-        return saveOrUpdate(user);
+        return save(user);
+    }
+
+    @Override
+    public UserModel updateImage(UserModel user, byte[] rawAvatarFile) {
+        user.setImageUrl(cloudinaryService.uploadAvatarImage(rawAvatarFile, user.getId()));
+        return save(user);
     }
 
     @Override
     public UserModel updateName(UserModel user, String name) {
         user.setName(name);
-        return saveOrUpdate(user);
+        return save(user);
     }
 }

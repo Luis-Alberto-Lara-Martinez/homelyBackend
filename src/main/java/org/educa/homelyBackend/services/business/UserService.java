@@ -13,11 +13,15 @@ public interface UserService {
 
     UserModel findByEmailOrThrow(String email);
 
-    UserModel saveOrUpdate(UserModel user);
+    UserModel createUser(String email, String name, String password, String role, String status);
+
+    UserModel save(UserModel user);
 
     UserModel updateHashedPassword(UserModel user, String password);
 
     UserModel updateImage(UserModel user, MultipartFile avatarFile);
+
+    UserModel updateImage(UserModel user, byte[] rawAvatarFile);
 
     UserModel updateName(UserModel user, String name);
 }
