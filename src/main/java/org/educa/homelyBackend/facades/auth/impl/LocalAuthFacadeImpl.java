@@ -1,8 +1,8 @@
 package org.educa.homelyBackend.facades.auth.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.dtos.request.LocalLogInRequest;
-import org.educa.homelyBackend.dtos.request.LocalRegisterRequest;
+import org.educa.homelyBackend.dtos.requests.LocalLogInRequest;
+import org.educa.homelyBackend.dtos.requests.LocalRegisterRequest;
 import org.educa.homelyBackend.facades.auth.LocalAuthFacade;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.business.UserService;

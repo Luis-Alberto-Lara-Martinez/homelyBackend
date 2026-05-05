@@ -2,12 +2,9 @@ package org.educa.homelyBackend.controllers.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.dtos.request.UpdateUserNameRequest;
-import org.educa.homelyBackend.dtos.request.UpdateUserPasswordRequest;
-import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.business.impl.UserServiceImpl;
-import org.educa.homelyBackend.utils.ExceptionUtil;
-import org.springframework.http.HttpStatus;
+import org.educa.homelyBackend.dtos.requests.UpdateUserPasswordRequest;
+import org.educa.homelyBackend.dtos.responses.UserProfileResponse;
+import org.educa.homelyBackend.facades.api.UserApiFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,54 +16,25 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserApiController {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserApiFacade userApiFacade;
 
     @GetMapping("/")
-    public ResponseEntity<Map<String, String>> findUserProfile(@AuthenticationPrincipal Jwt jwt) {
-        String email = jwt.getSubject();
-
-        UserModel user = userServiceImpl.findByEmailOrThrow(email);
-
-        return ResponseEntity.ok(Map.of(
-                "name", user.getName(),
-                "imageUrl", user.getImageUrl()
-        ));
+    public UserProfileResponse findUserProfile(@AuthenticationPrincipal Jwt jwt) {
+        return userApiFacade.findUserProfile(jwt);
     }
 
-    @PutMapping("/avatar")
-    public ResponseEntity<Map<String, String>> updateUserAvatar(
+    @PutMapping("/profile")
+    public UserProfileResponse updateUserProfile(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestPart(value = "avatarFile") MultipartFile avatarFile
+            @RequestPart(value = "avatarFile") MultipartFile avatarFile,
+            @RequestPart(value = "name") String name
     ) {
-        String email = jwt.getSubject();
-
-        String newImageUrl = userServiceImpl.updateImage(email, avatarFile);
-
-        return ResponseEntity.ok(Map.of(
-                "imageUrl", newImageUrl
-        ));
-    }
-
-    @PutMapping("/name")
-    public ResponseEntity<Map<String, String>> updateUserName(
-            @AuthenticationPrincipal Jwt jwt,
-            @Valid @RequestBody UpdateUserNameRequest request
-    ) {
-        String email = jwt.getSubject();
-        String name = request.name();
-
-        String newName = userServiceImpl.updateName(email, name);
-
-        return ResponseEntity.ok(Map.of(
-                "name", newName
-        ));
+        return userApiFacade.updateUserProfile(jwt, avatarFile, name);
     }
 
     @PutMapping("/password")
@@ -74,15 +42,6 @@ public class UserApiController {
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody UpdateUserPasswordRequest request
     ) {
-        String email = jwt.getSubject();
-        String password = request.password();
-        String confirmedPassword = request.confirmedPassword();
-
-        if (!password.equals(confirmedPassword)) {
-            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden").get();
-        }
-
-        userServiceImpl.updateHashedPassword(, email, password);
-        return ResponseEntity.ok().body(Map.of("message", "Password updated successfully"));
+        return userApiFacade.updateUserPassword(jwt, request);
     }
 }

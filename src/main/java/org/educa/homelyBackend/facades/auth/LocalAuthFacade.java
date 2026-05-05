@@ -1,7 +1,7 @@
 package org.educa.homelyBackend.facades.auth;
 
-import org.educa.homelyBackend.dtos.request.LocalLogInRequest;
-import org.educa.homelyBackend.dtos.request.LocalRegisterRequest;
+import org.educa.homelyBackend.dtos.requests.LocalLogInRequest;
+import org.educa.homelyBackend.dtos.requests.LocalRegisterRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Map;

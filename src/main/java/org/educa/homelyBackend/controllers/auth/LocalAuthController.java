@@ -2,8 +2,8 @@ package org.educa.homelyBackend.controllers.auth;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.dtos.request.LocalLogInRequest;
-import org.educa.homelyBackend.dtos.request.LocalRegisterRequest;
+import org.educa.homelyBackend.dtos.requests.LocalLogInRequest;
+import org.educa.homelyBackend.dtos.requests.LocalRegisterRequest;
 import org.educa.homelyBackend.facades.auth.LocalAuthFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
