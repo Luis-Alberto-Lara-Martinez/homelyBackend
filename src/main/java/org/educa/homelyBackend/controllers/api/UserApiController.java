@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.request.UpdateUserNameRequest;
 import org.educa.homelyBackend.dtos.request.UpdateUserPasswordRequest;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.business.UserService;
+import org.educa.homelyBackend.services.business.impl.UserServiceImpl;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +26,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserApiController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @GetMapping("/")
     public ResponseEntity<Map<String, String>> findUserProfile(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getSubject();
 
-        UserModel user = userService.findByEmailOrThrow(email);
+        UserModel user = userServiceImpl.findByEmailOrThrow(email);
 
         return ResponseEntity.ok(Map.of(
                 "name", user.getName(),
@@ -47,7 +47,7 @@ public class UserApiController {
     ) {
         String email = jwt.getSubject();
 
-        String newImageUrl = userService.updateImage(email, avatarFile);
+        String newImageUrl = userServiceImpl.updateImage(email, avatarFile);
 
         return ResponseEntity.ok(Map.of(
                 "imageUrl", newImageUrl
@@ -62,7 +62,7 @@ public class UserApiController {
         String email = jwt.getSubject();
         String name = request.name();
 
-        String newName = userService.updateName(email, name);
+        String newName = userServiceImpl.updateName(email, name);
 
         return ResponseEntity.ok(Map.of(
                 "name", newName
@@ -82,7 +82,7 @@ public class UserApiController {
             throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden").get();
         }
 
-        userService.updateHashedPassword(email, password);
+        userServiceImpl.updateHashedPassword(, email, password);
         return ResponseEntity.ok().body(Map.of("message", "Password updated successfully"));
     }
 }

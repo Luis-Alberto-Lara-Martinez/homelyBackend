@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class MessageService {
+public class MessageServiceImpl {
 
     private final MessageDao messageDao;
     private final SimpMessagingTemplate messagingTemplate;

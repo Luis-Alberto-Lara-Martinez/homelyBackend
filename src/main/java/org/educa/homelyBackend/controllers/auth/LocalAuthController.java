@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.request.LocalLogInRequest;
 import org.educa.homelyBackend.dtos.request.LocalRegisterRequest;
 import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.services.business.UserService;
+import org.educa.homelyBackend.services.business.impl.UserServiceImpl;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.educa.homelyBackend.utils.LogInUtil;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LocalAuthController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
     private final LogInUtil logInUtil;
 
     @PostMapping("/login")
@@ -30,9 +30,9 @@ public class LocalAuthController {
         String email = request.email().toLowerCase();
         String password = request.password();
 
-        UserModel user = userService.findByEmailOrThrow(email);
+        UserModel user = userServiceImpl.findByEmailOrThrow(email);
 
-        userService.checkHashedPassword(password, user.getHashedPassword());
+        userServiceImpl.checkHashedPassword(password, user.getHashedPassword());
 
         return logInUtil.createResponse(user);
     }
@@ -48,6 +48,6 @@ public class LocalAuthController {
             throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "The password and the confirmed password do not match").get();
         }
 
-        return logInUtil.createResponse(userService.createAndSendWelcomeEmail(name, email, password));
+        return logInUtil.createResponse(userServiceImpl.createAndSendWelcomeEmail(name, email, password));
     }
 }
