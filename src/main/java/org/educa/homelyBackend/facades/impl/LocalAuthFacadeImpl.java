@@ -55,10 +55,8 @@ public class LocalAuthFacadeImpl implements LocalAuthFacade {
             ).get();
         }
 
-        UserModel user = userService.createUser(email, name, password, "USER", "ACTIVE");
-
-        resendService.sendWelcomeEmail(email, name);
-
-        return logInUtil.createResponse(user);
+        return logInUtil.createResponse(logInUtil.createUserAndSendWelcomeEmail(
+                name, email, password, "USER", "ACTIVE"
+        ));
     }
 }

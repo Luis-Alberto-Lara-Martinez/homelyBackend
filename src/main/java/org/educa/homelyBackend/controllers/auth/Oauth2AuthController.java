@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/oauth2")
 @RequiredArgsConstructor
-public class Oauth2Controller {
+public class Oauth2AuthController {
 
     private final UserServiceImpl userServiceImpl;
     private final LogInUtil logInUtil;
