@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.ResetTokenDao;
 import org.educa.homelyBackend.models.ResetTokenModel;
 import org.educa.homelyBackend.models.UserModel;
+import org.educa.homelyBackend.properties.RandomTokenProperties;
 import org.educa.homelyBackend.services.business.ResetTokenService;
 import org.educa.homelyBackend.services.shared.RandomTokenService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
@@ -17,8 +18,6 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 public class ResetTokenServiceImpl implements ResetTokenService {
-
-    private static final Integer EXPIRATION_MINUTES = 20;
 
     private final ResetTokenDao resetTokenDao;
     private final RandomTokenService randomTokenService;
@@ -39,7 +38,7 @@ public class ResetTokenServiceImpl implements ResetTokenService {
                 .user(user)
                 .used(false)
                 .hashedToken(randomTokenService.generateHashedRandomToken(token))
-                .expiration(Instant.now(clock).plus(Duration.ofMinutes(EXPIRATION_MINUTES)))
+                .expiration(Instant.now(clock).plus(Duration.ofMinutes(RandomTokenProperties.EXPIRATION_MINUTES)))
                 .build());
     }
 
