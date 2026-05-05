@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.facades;
+package org.educa.homelyBackend.facades.auth;
 
 import org.educa.homelyBackend.dtos.request.LocalLogInRequest;
 import org.educa.homelyBackend.dtos.request.LocalRegisterRequest;

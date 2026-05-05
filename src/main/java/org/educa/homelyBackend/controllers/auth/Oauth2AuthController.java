@@ -1,7 +1,7 @@
 package org.educa.homelyBackend.controllers.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.facades.Oauth2Facade;
+import org.educa.homelyBackend.facades.auth.Oauth2AuthFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -16,15 +16,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class Oauth2AuthController {
 
-    private final Oauth2Facade oauth2Facade;
+    private final Oauth2AuthFacade oauth2AuthFacade;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> oauth2LogIn(@AuthenticationPrincipal Jwt jwt) {
-        return oauth2Facade.oauth2LogIn(jwt);
+        return oauth2AuthFacade.oauth2LogIn(jwt);
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> oauth2Register(@AuthenticationPrincipal Jwt jwt) {
-        return oauth2Facade.oauth2Register(jwt);
+        return oauth2AuthFacade.oauth2Register(jwt);
     }
 }

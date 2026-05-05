@@ -1,7 +1,7 @@
-package org.educa.homelyBackend.facades.impl;
+package org.educa.homelyBackend.facades.auth.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.facades.Oauth2Facade;
+import org.educa.homelyBackend.facades.auth.Oauth2AuthFacade;
 import org.educa.homelyBackend.services.business.UserService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.educa.homelyBackend.utils.LogInUtil;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class Oauth2FacadeImpl implements Oauth2Facade {
+public class Oauth2AuthFacadeImpl implements Oauth2AuthFacade {
 
     private final UserService userService;
     private final LogInUtil logInUtil;
