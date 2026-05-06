@@ -23,7 +23,7 @@ public class UserApiController {
 
     private final UserApiFacade userApiFacade;
 
-    @GetMapping("/")
+    @GetMapping("/profile")
     public UserProfileResponse findUserProfile(@AuthenticationPrincipal Jwt jwt) {
         return userApiFacade.findUserProfile(jwt);
     }
@@ -31,8 +31,8 @@ public class UserApiController {
     @PutMapping("/profile")
     public UserProfileResponse updateUserProfile(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestPart(value = "avatarFile") MultipartFile avatarFile,
-            @RequestPart(value = "name") String name
+            @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile,
+            @RequestPart(value = "name", required = false) String name
     ) {
         return userApiFacade.updateUserProfile(jwt, avatarFile, name);
     }

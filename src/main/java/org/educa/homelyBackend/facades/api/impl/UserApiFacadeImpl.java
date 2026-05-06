@@ -40,7 +40,7 @@ public class UserApiFacadeImpl implements UserApiFacade {
             user = userService.updateImage(user, avatarFile);
         }
 
-        if (name != null) {
+        if (name != null && !name.isBlank()) {
             user = userService.updateName(user, name);
         }
 
