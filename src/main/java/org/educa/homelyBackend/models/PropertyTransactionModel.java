@@ -39,6 +39,7 @@ public class PropertyTransactionModel {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "transaction")
     private Set<PropertyModel> properties = new LinkedHashSet<>();
 }

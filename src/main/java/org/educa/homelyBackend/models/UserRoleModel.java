@@ -39,6 +39,7 @@ public class UserRoleModel {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "role")
     private Set<UserModel> users = new LinkedHashSet<>();
 }

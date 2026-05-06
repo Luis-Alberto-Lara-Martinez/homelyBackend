@@ -40,9 +40,11 @@ public class PropertyTypeModel {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "type")
     private Set<PropertyModel> properties = new LinkedHashSet<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "propertyTypes")
     private Set<PropertyExtraModel> propertyExtras = new LinkedHashSet<>();
 }

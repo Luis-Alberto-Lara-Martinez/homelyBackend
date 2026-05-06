@@ -41,6 +41,7 @@ public class PropertyExtraModel {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "properties_property_extras",
@@ -49,6 +50,7 @@ public class PropertyExtraModel {
     )
     private Set<PropertyModel> properties = new LinkedHashSet<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "property_extras_property_types",

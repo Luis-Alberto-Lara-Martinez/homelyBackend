@@ -50,6 +50,7 @@ public class ConversationModel {
     @Column(name = "created_at")
     private Instant createdAt;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "conversations_users",
@@ -58,6 +59,7 @@ public class ConversationModel {
     )
     private Set<UserModel> users = new LinkedHashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "conversation")
     private Set<MessageModel> messages = new LinkedHashSet<>();
 }

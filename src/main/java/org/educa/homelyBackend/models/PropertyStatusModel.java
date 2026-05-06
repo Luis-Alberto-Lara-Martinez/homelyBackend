@@ -39,6 +39,7 @@ public class PropertyStatusModel {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    @Builder.Default
     @OneToMany(mappedBy = "status")
     private Set<PropertyModel> properties = new LinkedHashSet<>();
 }

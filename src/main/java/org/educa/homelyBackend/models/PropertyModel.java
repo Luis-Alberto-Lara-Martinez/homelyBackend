@@ -105,21 +105,25 @@ public class PropertyModel {
     @JoinColumn(name = "updated_by")
     private UserModel updatedBy;
 
+    @Builder.Default
     @OneToMany(mappedBy = "property")
     private Set<ConversationModel> conversations = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "property")
     private EnergyCertificateModel energyCertificate;
 
+    @Builder.Default
     @OneToMany(mappedBy = "property")
     private Set<FavouriteModel> favourites = new LinkedHashSet<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "properties")
     private Set<PropertyExtraModel> propertyExtras = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "property")
     private PropertyAddressModel propertyAddress;
 
+    @Builder.Default
     @OneToMany(mappedBy = "property")
     private Set<PropertyImageModel> propertyImages = new LinkedHashSet<>();
 
