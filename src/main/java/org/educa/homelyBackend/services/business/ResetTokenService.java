@@ -4,6 +4,7 @@ import org.educa.homelyBackend.models.ResetTokenModel;
 import org.educa.homelyBackend.models.UserModel;
 
 public interface ResetTokenService {
+
     ResetTokenModel findByTokenOrThrow(String token);
 
     ResetTokenModel createResetToken(UserModel user, String token);

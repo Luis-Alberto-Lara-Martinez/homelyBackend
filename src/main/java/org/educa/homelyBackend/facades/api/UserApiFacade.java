@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 public interface UserApiFacade {
+
     UserProfileResponse findUserProfile(Jwt jwt);
 
     UserProfileResponse updateUserProfile(Jwt jwt, MultipartFile avatarFile, String name);

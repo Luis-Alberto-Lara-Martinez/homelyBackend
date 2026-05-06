@@ -8,4 +8,10 @@ public record CloudinaryProperties(
         String apiKey,
         String apiSecret
 ) {
+
+    private static final String BASE_DIRECTORY = "homely";
+
+    public static final String AVATARS_DIRECTORY = BASE_DIRECTORY + "/avatars";
+
+    public static final String PROPERTIES_DIRECTORY = BASE_DIRECTORY + "/properties";
 }

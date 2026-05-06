@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Map;
 
 public interface ResetTokenApiFacade {
+
     ResponseEntity<Map<String, String>> forgottenPassword(ForgottenPasswordRequest request);
 
     ResponseEntity<Map<String, String>> checkResetToken(CheckResetTokenRequest request);

@@ -8,5 +8,6 @@ public record WebSocketProperties(
         String endpoint,
         String topicPrefix
 ) {
+
     public static final String[] ALLOWED_ORIGINS = CorsProperties.ALLOWED_ORIGINS.toArray(String[]::new);
 }

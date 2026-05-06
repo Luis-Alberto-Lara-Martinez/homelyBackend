@@ -2,6 +2,7 @@ package org.educa.homelyBackend.services.shared.impl;
 
 import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
+import org.educa.homelyBackend.properties.CloudinaryProperties;
 import org.educa.homelyBackend.services.shared.CloudinaryService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
@@ -15,37 +16,33 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CloudinaryServiceImpl implements CloudinaryService {
 
-    private static final String BASE_DIRECTORY = "homely";
-    private static final String AVATARS_DIRECTORY = BASE_DIRECTORY + "/avatars";
-    private static final String PROPERTIES_DIRECTORY = BASE_DIRECTORY + "/properties";
-
     private final Cloudinary cloudinary;
 
     @Override
     public String uploadAvatarImage(MultipartFile avatarImageFile, Integer userId) {
-        return uploadImage(avatarImageFile, AVATARS_DIRECTORY, buildAvatarImageFileName(userId));
+        return uploadImage(avatarImageFile, CloudinaryProperties.AVATARS_DIRECTORY, buildAvatarImageFileName(userId));
     }
 
     @Override
     public String uploadAvatarImage(byte[] rawAvatarImageFile, Integer userId) {
-        return uploadImage(rawAvatarImageFile, AVATARS_DIRECTORY, buildAvatarImageFileName(userId));
+        return uploadImage(rawAvatarImageFile, CloudinaryProperties.AVATARS_DIRECTORY, buildAvatarImageFileName(userId));
     }
 
     @Override
     public String uploadPropertyImage(MultipartFile propertyImageFile, Integer propertyId, Integer propertyImageOrder) {
         return uploadImage(
-                propertyImageFile, PROPERTIES_DIRECTORY, buildPropertyImageFileName(propertyId, propertyImageOrder)
+                propertyImageFile, CloudinaryProperties.PROPERTIES_DIRECTORY, buildPropertyImageFileName(propertyId, propertyImageOrder)
         );
     }
 
     @Override
     public void deleteAvatarImage(Integer userId) {
-        deleteImage(AVATARS_DIRECTORY + "/" + buildAvatarImageFileName(userId));
+        deleteImage(CloudinaryProperties.AVATARS_DIRECTORY + "/" + buildAvatarImageFileName(userId));
     }
 
     @Override
     public void deletePropertyImage(Integer propertyId, Integer propertyImageOrder) {
-        deleteImage(PROPERTIES_DIRECTORY + "/" + buildPropertyImageFileName(propertyId, propertyImageOrder));
+        deleteImage(CloudinaryProperties.PROPERTIES_DIRECTORY + "/" + buildPropertyImageFileName(propertyId, propertyImageOrder));
     }
 
     private String uploadImage(MultipartFile imageFile, String folder, String fileName) {

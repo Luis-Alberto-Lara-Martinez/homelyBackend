@@ -4,6 +4,7 @@ import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.CreateEmailOptions;
 import lombok.RequiredArgsConstructor;
+import org.educa.homelyBackend.properties.ResendProperties;
 import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.jsoup.Jsoup;
@@ -20,9 +21,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ResendServiceImpl implements ResendService {
 
-    private static final String FROM_EMAIL = "Homely <comunications@homelyweb.app>";
-    private static final String BASE_FRONTEND_URL = "https://homelyweb.app";
-
     private final Resend resend;
     private final TemplateEngine templateEngine;
     private final Clock clock;
@@ -34,7 +32,7 @@ public class ResendServiceImpl implements ResendService {
 
     @Override
     public void sendResetPasswordEmail(String to, String name, String resetToken, Integer expirationMinutes) {
-        String resetLink = BASE_FRONTEND_URL + "/reset-password?token=" + resetToken;
+        String resetLink = ResendProperties.BASE_FRONTEND_URL + "/reset-password?token=" + resetToken;
 
         Map<String, Object> extraVariables = Map.of(
                 "resetLink", resetLink,
@@ -50,7 +48,7 @@ public class ResendServiceImpl implements ResendService {
         String html = templateEngine.process(templateName, createContext(name, extraVariables));
 
         CreateEmailOptions params = CreateEmailOptions.builder()
-                .from(FROM_EMAIL)
+                .from(ResendProperties.FROM_EMAIL)
                 .to(to)
                 .subject(subject)
                 .html(html)

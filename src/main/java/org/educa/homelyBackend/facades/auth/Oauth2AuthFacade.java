@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.Map;
 
 public interface Oauth2AuthFacade {
+
     ResponseEntity<Map<String, String>> oauth2LogIn(Jwt jwt);
 
     ResponseEntity<Map<String, String>> oauth2Register(Jwt jwt);

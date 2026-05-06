@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface ResetTokenDao extends JpaRepository<ResetTokenModel, Integer> {
+
     Optional<ResetTokenModel> findByHashedToken(String hashedToken);
 }

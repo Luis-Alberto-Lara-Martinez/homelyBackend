@@ -8,4 +8,6 @@ public record JwtProperties(
         String issuer,
         String secretKey
 ) {
+
+    public static final String BEARER_PREFIX = "Bearer ";
 }

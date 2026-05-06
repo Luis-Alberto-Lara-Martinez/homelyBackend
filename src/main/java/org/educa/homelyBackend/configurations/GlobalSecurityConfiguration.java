@@ -2,6 +2,8 @@ package org.educa.homelyBackend.configurations;
 
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.filters.JwtFilter;
+import org.educa.homelyBackend.routes.ConfigurationRoutes;
+import org.educa.homelyBackend.routes.Oauth2Routes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -24,18 +26,16 @@ public class GlobalSecurityConfiguration {
     @Bean
     @Order(1)
     public SecurityFilterChain oauth2Chain(HttpSecurity http) {
-        JwtIssuerAuthenticationManagerResolver resolver = JwtIssuerAuthenticationManagerResolver.fromTrustedIssuers(
-                "https://accounts.google.com",
-                "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0"
-        );
-
         return generateCommonSettings(http)
-                .securityMatcher("/oauth2/**")
+                .securityMatcher(ConfigurationRoutes.OAUTH2)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth -> oauth
-                        .authenticationManagerResolver(resolver)
+                        .authenticationManagerResolver(JwtIssuerAuthenticationManagerResolver.fromTrustedIssuers(
+                                Oauth2Routes.GOOGLE,
+                                Oauth2Routes.MICROSOFT
+                        ))
                 )
                 .build();
     }
@@ -44,9 +44,9 @@ public class GlobalSecurityConfiguration {
     @Order(2)
     public SecurityFilterChain apiChain(HttpSecurity http) {
         return generateCommonSettings(http)
-                .securityMatcher("/admin/**", "/api/**")
+                .securityMatcher(ConfigurationRoutes.ADMIN, ConfigurationRoutes.API)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers(ConfigurationRoutes.ADMIN).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -57,7 +57,7 @@ public class GlobalSecurityConfiguration {
     @Order(3)
     public SecurityFilterChain defaultChain(HttpSecurity http) {
         return generateCommonSettings(http)
-                .securityMatcher("/**")
+                .securityMatcher(ConfigurationRoutes.DEFAULT)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )

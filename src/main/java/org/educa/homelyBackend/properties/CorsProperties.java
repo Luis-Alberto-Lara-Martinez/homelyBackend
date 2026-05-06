@@ -3,6 +3,7 @@ package org.educa.homelyBackend.properties;
 import java.util.List;
 
 public record CorsProperties() {
+
     public static final List<String> ALLOWED_ORIGINS = List.of(
             "http://localhost:4200", "https://homelyweb.app", "https://www.homelyweb.app"
     );
