@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 
 public interface UserService {
-
     Page<UserModel> findAll(Integer page, Integer size, String sortBy);
 
     Optional<UserModel> findByEmail(String email);
