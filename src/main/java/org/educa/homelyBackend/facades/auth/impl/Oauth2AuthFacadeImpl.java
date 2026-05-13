@@ -52,8 +52,6 @@ public class Oauth2AuthFacadeImpl implements Oauth2AuthFacade {
             ).get();
         }
 
-        return logInUtil.createResponse(logInUtil.createUserAndSendWelcomeEmail(
-                name, email, null, "USER", "ACTIVE"
-        ));
+        return logInUtil.createResponse(logInUtil.createClientAndSendWelcomeEmail(name, email, null));
     }
 }

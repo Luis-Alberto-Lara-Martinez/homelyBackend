@@ -7,7 +7,6 @@ import org.educa.homelyBackend.facades.auth.LocalAuthFacade;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.business.UserService;
 import org.educa.homelyBackend.services.shared.PasswordEncoderService;
-import org.educa.homelyBackend.services.shared.ResendService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.educa.homelyBackend.utils.LogInUtil;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,6 @@ public class LocalAuthFacadeImpl implements LocalAuthFacade {
 
     private final UserService userService;
     private final PasswordEncoderService passwordEncoderService;
-    private final ResendService resendService;
     private final LogInUtil logInUtil;
 
     @Override
@@ -55,8 +53,6 @@ public class LocalAuthFacadeImpl implements LocalAuthFacade {
             ).get();
         }
 
-        return logInUtil.createResponse(logInUtil.createUserAndSendWelcomeEmail(
-                name, email, password, "USER", "ACTIVE"
-        ));
+        return logInUtil.createResponse(logInUtil.createClientAndSendWelcomeEmail(name, email, password));
     }
 }

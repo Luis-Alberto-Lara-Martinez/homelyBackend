@@ -20,12 +20,9 @@ public class LogInUtil {
     private final JwtService jwtService;
 
     @Transactional(rollbackFor = Exception.class)
-    public UserModel createUserAndSendWelcomeEmail(
-            String name, String email, String password, String role, String status
-    ) {
+    public UserModel createClientAndSendWelcomeEmail(String name, String email, String password) {
         resendService.sendWelcomeEmail(email, name);
-
-        return userService.createUser(email, name, password, role, status);
+        return userService.createUser(email, name, password, "usuario", "activo");
     }
 
     public ResponseEntity<Map<String, String>> createResponse(UserModel user) {

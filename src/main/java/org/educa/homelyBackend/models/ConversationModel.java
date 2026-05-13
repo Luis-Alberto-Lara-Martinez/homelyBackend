@@ -6,9 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -33,7 +32,13 @@ import java.util.Set;
 @Builder
 @DynamicInsert
 @Entity
-@Table(name = "conversations")
+@Table(
+        name = "conversations",
+        indexes = {
+                @Index(name = "conversations_pkey", columnList = "id", unique = true),
+                @Index(name = "idx_conversations_user_id", columnList = "user_id")
+        }
+)
 public class ConversationModel {
 
     @Id
@@ -41,23 +46,19 @@ public class ConversationModel {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "property_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "property_id", nullable = false)
     private PropertyModel property;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserModel user;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
     private Instant createdAt;
-
-    @Builder.Default
-    @ManyToMany
-    @JoinTable(
-            name = "conversations_users",
-            joinColumns = @JoinColumn(name = "conversation_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<UserModel> users = new LinkedHashSet<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "conversation")

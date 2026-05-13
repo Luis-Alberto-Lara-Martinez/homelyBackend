@@ -47,6 +47,11 @@ public class MessageModel {
     @JoinColumn(name = "conversation_id", nullable = false)
     private ConversationModel conversation;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "sender_id", nullable = false)
+    private UserModel sender;
+
     @Column(name = "content", nullable = false)
     private String content;
 
