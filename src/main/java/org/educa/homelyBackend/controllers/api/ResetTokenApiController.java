@@ -6,6 +6,7 @@ import org.educa.homelyBackend.dtos.requests.CheckResetTokenRequest;
 import org.educa.homelyBackend.dtos.requests.ForgottenPasswordRequest;
 import org.educa.homelyBackend.dtos.requests.ResetPasswordRequest;
 import org.educa.homelyBackend.facades.api.ResetTokenApiFacade;
+import org.educa.homelyBackend.routes.ConfigurationRoutes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(ConfigurationRoutes.API)
 @RequiredArgsConstructor
 public class ResetTokenApiController {
 

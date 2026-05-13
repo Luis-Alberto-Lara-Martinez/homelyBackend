@@ -2,6 +2,7 @@ package org.educa.homelyBackend.controllers.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.facades.auth.Oauth2AuthFacade;
+import org.educa.homelyBackend.routes.ConfigurationRoutes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/oauth2")
+@RequestMapping(ConfigurationRoutes.OAUTH2)
 @RequiredArgsConstructor
 public class Oauth2AuthController {
 

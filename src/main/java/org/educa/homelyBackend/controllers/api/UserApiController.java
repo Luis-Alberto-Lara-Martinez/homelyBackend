@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.requests.UpdateUserPasswordRequest;
 import org.educa.homelyBackend.dtos.responses.UserProfileResponse;
 import org.educa.homelyBackend.facades.api.UserApiFacade;
+import org.educa.homelyBackend.routes.ConfigurationRoutes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping(ConfigurationRoutes.API + "/user")
 @RequiredArgsConstructor
 public class UserApiController {
 

@@ -27,7 +27,7 @@ public class GlobalSecurityConfiguration {
     @Order(1)
     public SecurityFilterChain oauth2Chain(HttpSecurity http) {
         return generateCommonSettings(http)
-                .securityMatcher(ConfigurationRoutes.OAUTH2)
+                .securityMatcher(ConfigurationRoutes.OAUTH2_ALL_ROUTES)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated()
                 )
@@ -44,9 +44,9 @@ public class GlobalSecurityConfiguration {
     @Order(2)
     public SecurityFilterChain apiChain(HttpSecurity http) {
         return generateCommonSettings(http)
-                .securityMatcher(ConfigurationRoutes.ADMIN, ConfigurationRoutes.API)
+                .securityMatcher(ConfigurationRoutes.ADMIN_ALL_ROUTES, ConfigurationRoutes.API_ALL_ROUTES)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ConfigurationRoutes.ADMIN).hasRole("ADMIN")
+                        .requestMatchers(ConfigurationRoutes.ADMIN_ALL_ROUTES).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
