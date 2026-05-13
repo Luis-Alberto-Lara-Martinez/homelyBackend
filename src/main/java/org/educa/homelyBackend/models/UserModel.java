@@ -90,7 +90,7 @@ public class UserModel {
     private UserModel updatedBy;
 
     @Builder.Default
-    @ManyToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private Set<ConversationModel> conversations = new LinkedHashSet<>();
 
     @Builder.Default
