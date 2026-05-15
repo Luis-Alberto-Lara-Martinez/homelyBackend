@@ -14,8 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +47,18 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         return pagedProperties;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PropertyModel> findAllWithDetails() {
+        List<PropertyModel> properties = propertyDao.findAllWithDetails();
+
+        if (properties.isEmpty()) {
+            throw ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "No existe ninguna propiedad").get();
+        }
+
+        return properties;
     }
 
     @Override

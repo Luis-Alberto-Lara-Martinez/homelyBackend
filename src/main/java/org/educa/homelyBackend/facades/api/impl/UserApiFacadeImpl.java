@@ -10,7 +10,6 @@ import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.educa.homelyBackend.utils.ResponseEntityUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,8 +22,8 @@ public class UserApiFacadeImpl implements UserApiFacade {
     private final UserService userService;
 
     @Override
-    public UserProfileResponse findUserProfile(Jwt jwt) {
-        UserModel user = userService.findByEmailOrThrow(jwt.getSubject());
+    public UserProfileResponse findUserProfile(String email) {
+        UserModel user = userService.findByEmailOrThrow(email);
 
         return UserProfileResponse.builder()
                 .name(user.getName())
@@ -33,8 +32,8 @@ public class UserApiFacadeImpl implements UserApiFacade {
     }
 
     @Override
-    public UserProfileResponse updateUserProfile(Jwt jwt, MultipartFile avatarFile, String name) {
-        UserModel user = userService.findByEmailOrThrow(jwt.getSubject());
+    public UserProfileResponse updateUserProfile(String email, MultipartFile avatarFile, String name) {
+        UserModel user = userService.findByEmailOrThrow(email);
 
         if (avatarFile != null) {
             user = userService.updateImage(user, avatarFile);
@@ -51,7 +50,7 @@ public class UserApiFacadeImpl implements UserApiFacade {
     }
 
     @Override
-    public ResponseEntity<Map<String, String>> updateUserPassword(Jwt jwt, UpdateUserPasswordRequest request) {
+    public ResponseEntity<Map<String, String>> updateUserPassword(String email, UpdateUserPasswordRequest request) {
         String password = request.password();
 
         if (!password.equals(request.confirmedPassword())) {
@@ -61,7 +60,7 @@ public class UserApiFacadeImpl implements UserApiFacade {
             ).get();
         }
 
-        userService.updateHashedPassword(userService.findByEmailOrThrow(jwt.getSubject()), password);
+        userService.updateHashedPassword(userService.findByEmailOrThrow(email), password);
 
         return ResponseEntityUtil.ok("Contraseña actualizada correctamente");
     }

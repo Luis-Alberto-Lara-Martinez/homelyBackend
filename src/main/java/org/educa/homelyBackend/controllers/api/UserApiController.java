@@ -25,24 +25,24 @@ public class UserApiController {
     private final UserApiFacade userApiFacade;
 
     @GetMapping("/profile")
-    public UserProfileResponse findUserProfile(@AuthenticationPrincipal Jwt jwt) {
-        return userApiFacade.findUserProfile(jwt);
+    public UserProfileResponse findUserProfile(@AuthenticationPrincipal String email) {
+        return userApiFacade.findUserProfile(email);
     }
 
     @PutMapping("/profile")
     public UserProfileResponse updateUserProfile(
-            @AuthenticationPrincipal Jwt jwt,
+            @AuthenticationPrincipal String email,
             @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile,
             @RequestPart(value = "name", required = false) String name
     ) {
-        return userApiFacade.updateUserProfile(jwt, avatarFile, name);
+        return userApiFacade.updateUserProfile(email, avatarFile, name);
     }
 
     @PutMapping("/password")
     public ResponseEntity<?> updateUserPassword(
-            @AuthenticationPrincipal Jwt jwt,
+            @AuthenticationPrincipal String email,
             @Valid @RequestBody UpdateUserPasswordRequest request
     ) {
-        return userApiFacade.updateUserPassword(jwt, request);
+        return userApiFacade.updateUserPassword(email, request);
     }
 }

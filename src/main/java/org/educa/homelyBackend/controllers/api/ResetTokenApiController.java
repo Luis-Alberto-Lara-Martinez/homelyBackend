@@ -8,7 +8,6 @@ import org.educa.homelyBackend.dtos.requests.ResetPasswordRequest;
 import org.educa.homelyBackend.facades.api.ResetTokenApiFacade;
 import org.educa.homelyBackend.routes.ConfigurationRoutes;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +27,7 @@ public class ResetTokenApiController {
         return resetTokenApiFacade.forgottenPassword(request);
     }
 
-    @GetMapping("/check-reset-token")
+    @PostMapping("/check-reset-token")
     public ResponseEntity<Map<String, String>> checkResetToken(@Valid @RequestBody CheckResetTokenRequest request) {
         return resetTokenApiFacade.checkResetToken(request);
     }

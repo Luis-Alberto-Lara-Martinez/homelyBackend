@@ -8,9 +8,12 @@ import org.educa.homelyBackend.models.UserModel;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface PropertyService {
     Page<PropertyModel> findAll(Integer page, Integer size, String sortBy);
+
+    List<PropertyModel> findAllWithDetails();
 
     PropertyModel save(PropertyModel propertyModel);
 
