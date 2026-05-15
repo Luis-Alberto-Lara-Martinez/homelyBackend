@@ -30,7 +30,7 @@ public class Oauth2AuthFacadeImpl implements Oauth2AuthFacade {
             ).get();
         }
 
-        return logInUtil.createResponse(userService.findByEmailOrThrow(email));
+        return logInUtil.createResponse(userService.findByEmailOrThrow(email.toLowerCase()));
     }
 
     @Override
