@@ -26,7 +26,7 @@ public class UserAdminController {
 
     private final UserAdminFacade userAdminFacade;
 
-    @GetMapping("/users")
+    @PostMapping("/users")
     public Page<FindAllUsersResponse> findAllUsers(@Valid @RequestBody FindAllUsersRequest request) {
         return userAdminFacade.findAll(request.page(), request.size(), request.sortBy());
     }
