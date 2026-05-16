@@ -1,10 +1,14 @@
 package org.educa.homelyBackend.facades.admin.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.educa.homelyBackend.dtos.requests.CreateNewUserRequest;
 import org.educa.homelyBackend.dtos.responses.FindAllUsersResponse;
 import org.educa.homelyBackend.facades.admin.UserAdminFacade;
+import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.business.UserService;
+import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,6 +43,24 @@ public class UserAdminFacadeImpl implements UserAdminFacade {
                     .updatedBy(updatedBy)
                     .build();
         });
+    }
+
+    @Override
+    public void createNewUser(String tokenEmail, CreateNewUserRequest request) {
+        if (!request.password().equals(request.confirmedPassword())) {
+            throw ExceptionUtil.manageException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden").get();
+        }
+
+        UserModel user = userService.createUser(
+                request.email(),
+                request.name(),
+                request.password(),
+                request.role(),
+                request.status()
+        );
+
+        userService.updateCreatedBy(user, userService.findByEmailOrThrow(tokenEmail));
+        userService.updateUpdatedBy(user, userService.findByEmailOrThrow(tokenEmail));
     }
 }
 

@@ -122,4 +122,16 @@ public class UserServiceImpl implements UserService {
         user.setName(name);
         return save(user);
     }
+
+    @Override
+    public UserModel updateCreatedBy(UserModel user, UserModel createdBy) {
+        user.setCreatedBy(createdBy);
+        return save(user);
+    }
+
+    @Override
+    public UserModel updateUpdatedBy(UserModel user, UserModel updatedBy) {
+        user.setUpdatedBy(updatedBy);
+        return save(user);
+    }
 }

@@ -26,4 +26,8 @@ public interface UserService {
     UserModel updateImage(UserModel user, byte[] rawAvatarFile);
 
     UserModel updateName(UserModel user, String name);
+
+    UserModel updateCreatedBy(UserModel user, UserModel createdBy);
+
+    UserModel updateUpdatedBy(UserModel user, UserModel updatedBy);
 }
