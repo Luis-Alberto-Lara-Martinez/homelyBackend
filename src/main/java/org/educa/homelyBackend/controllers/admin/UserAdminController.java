@@ -36,8 +36,7 @@ public class UserAdminController {
             @AuthenticationPrincipal String email,
             @Valid @RequestBody CreateNewUserRequest request
             ) {
-
-
+        userAdminFacade.createNewUser(email, request);
         return ResponseEntityUtil.ok("Usuario creado exitosamente");
     }
 }
