@@ -17,6 +17,8 @@ public interface UserService {
 
     UserModel save(UserModel user);
 
+    void delete(Integer id);
+
     UserModel updateHashedPassword(UserModel user, String password);
 
     UserModel updateImage(UserModel user, MultipartFile avatarFile);

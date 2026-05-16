@@ -95,6 +95,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void delete(Integer id) {
+        userDao.deleteById(id);
+    }
+
+    @Override
     public UserModel updateHashedPassword(UserModel user, String password) {
         user.setHashedPassword(passwordEncoderService.generateHashedPassword(password));
         return save(user);
