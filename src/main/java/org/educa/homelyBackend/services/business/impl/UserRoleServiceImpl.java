@@ -8,6 +8,8 @@ import org.educa.homelyBackend.utils.ExceptionUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserRoleServiceImpl implements UserRoleService {
@@ -21,5 +23,10 @@ public class UserRoleServiceImpl implements UserRoleService {
                         HttpStatus.NOT_FOUND,
                         "No existe ningún userStatus con el name " + name
                 ).get());
+    }
+
+    @Override
+    public List<UserRoleModel> findAll() {
+        return userRoleDao.findAll();
     }
 }

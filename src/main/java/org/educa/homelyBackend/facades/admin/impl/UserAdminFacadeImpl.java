@@ -62,6 +62,11 @@ public class UserAdminFacadeImpl implements UserAdminFacade {
         userService.updateCreatedBy(user, userService.findByEmailOrThrow(tokenEmail));
         userService.updateUpdatedBy(user, userService.findByEmailOrThrow(tokenEmail));
     }
+
+    @Override
+    public void deleteUser(Integer id) {
+        userService.delete(id);
+    }
 }
 
 

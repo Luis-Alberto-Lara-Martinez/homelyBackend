@@ -8,4 +8,6 @@ public interface UserAdminFacade {
     Page<FindAllUsersResponse> findAll(Integer page, Integer size, String sortBy);
 
     void createNewUser(String tokenEmail, CreateNewUserRequest request);
+
+    void deleteUser(Integer id);
 }
