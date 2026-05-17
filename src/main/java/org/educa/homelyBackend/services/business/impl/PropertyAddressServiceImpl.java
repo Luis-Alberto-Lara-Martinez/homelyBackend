@@ -3,7 +3,13 @@ package org.educa.homelyBackend.services.business.impl;
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.PropertyAddressDao;
 import org.educa.homelyBackend.models.PropertyAddressModel;
+import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.business.PropertyAddressService;
+import org.educa.homelyBackend.utils.ExceptionUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -41,6 +47,25 @@ public class PropertyAddressServiceImpl implements PropertyAddressService {
                         address.getLongitude().doubleValue()
                 )))
                 .toList();
+    }
+
+    @Override
+    public Page<PropertyAddressModel> findAll(Integer pageNumber, Integer pageSize) {
+        if (pageNumber == null || pageNumber - 1 < 0) {
+            pageNumber = 0;
+        }
+
+        if (pageSize == null || pageSize <= 0) {
+            pageSize = 30;
+        }
+
+        Page<PropertyAddressModel> pagedPropertyAddresses = propertyAddressDao.findAll(PageRequest.of(pageNumber - 1, pageSize));
+
+        if (pagedPropertyAddresses.isEmpty()) {
+            throw ExceptionUtil.manageException(HttpStatus.NOT_FOUND, "No existe ningún usuario").get();
+        }
+
+        return pagedPropertyAddresses;
     }
 
     @Override

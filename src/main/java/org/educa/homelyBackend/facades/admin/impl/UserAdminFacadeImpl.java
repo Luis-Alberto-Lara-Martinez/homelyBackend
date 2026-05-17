@@ -18,6 +18,34 @@ public class UserAdminFacadeImpl implements UserAdminFacade {
     private final UserService userService;
 
     @Override
+    public FindAllUsersResponse findUser(String email) {
+        UserModel user = userService.findByEmailOrThrow(email);
+
+        String createdBy = null;
+        String updatedBy = null;
+
+        if (user.getCreatedBy() != null) {
+            createdBy = user.getCreatedBy().getName();
+        }
+        if (user.getUpdatedBy() != null) {
+            updatedBy = user.getUpdatedBy().getName();
+        }
+        return FindAllUsersResponse.builder()
+                .id(user.getId())
+                .role(user.getRole().getName())
+                .status(user.getStatus().getName())
+                .imageUrl(user.getImageUrl())
+                .name(user.getName())
+                .email(user.getEmail())
+                .hashedPassword(user.getHashedPassword())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .createdBy(createdBy)
+                .updatedBy(updatedBy)
+                .build();
+    }
+
+    @Override
     public Page<FindAllUsersResponse> findAll(Integer page, Integer size, String sortBy) {
         return userService.findAll(page, size, sortBy).map(user -> {
             String createdBy = null;

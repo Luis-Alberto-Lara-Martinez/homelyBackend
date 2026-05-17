@@ -5,6 +5,8 @@ import org.educa.homelyBackend.dtos.responses.FindAllUsersResponse;
 import org.springframework.data.domain.Page;
 
 public interface UserAdminFacade {
+    FindAllUsersResponse findUser(String email);
+
     Page<FindAllUsersResponse> findAll(Integer page, Integer size, String sortBy);
 
     void createNewUser(String tokenEmail, CreateNewUserRequest request);

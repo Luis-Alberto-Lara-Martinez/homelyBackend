@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.requests.CreateNewUserRequest;
 import org.educa.homelyBackend.dtos.requests.DeleteUserRequest;
 import org.educa.homelyBackend.dtos.requests.FindAllUsersRequest;
+import org.educa.homelyBackend.dtos.requests.FindUserRequest;
 import org.educa.homelyBackend.dtos.requests.UpdateUserRoleRequest;
 import org.educa.homelyBackend.dtos.requests.UpdateUserStatusRequest;
 import org.educa.homelyBackend.dtos.responses.FindAllUsersResponse;
@@ -15,10 +16,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -33,6 +36,11 @@ public class UserAdminController {
     @PostMapping("/users")
     public Page<FindAllUsersResponse> findAllUsers(@Valid @RequestBody FindAllUsersRequest request) {
         return userAdminFacade.findAll(request.page(), request.size(), request.sortBy());
+    }
+
+    @GetMapping("/user")
+    public FindAllUsersResponse findUser(@RequestParam("email") String email) {
+        return userAdminFacade.findUser(email);
     }
 
     @PostMapping("/user")
