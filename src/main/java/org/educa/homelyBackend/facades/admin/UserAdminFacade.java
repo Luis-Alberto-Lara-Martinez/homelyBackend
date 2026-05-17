@@ -10,4 +10,8 @@ public interface UserAdminFacade {
     void createNewUser(String tokenEmail, CreateNewUserRequest request);
 
     void deleteUser(Integer id);
+
+    void updateRole(String email, String role, String tokenEmail);
+
+    void updateStatus(String email, String status, String tokenEmail);
 }

@@ -134,4 +134,16 @@ public class UserServiceImpl implements UserService {
         user.setUpdatedBy(updatedBy);
         return save(user);
     }
+
+    @Override
+    public void updateRole(UserModel user, String role) {
+        user.setRole(userRoleService.findByNameOrThrow(role));
+        save(user);
+    }
+
+    @Override
+    public void updateStatus(UserModel user, String status) {
+        user.setStatus(userStatusService.findByNameOrThrow(status));
+        save(user);
+    }
 }

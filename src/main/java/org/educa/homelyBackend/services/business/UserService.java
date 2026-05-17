@@ -30,4 +30,8 @@ public interface UserService {
     UserModel updateCreatedBy(UserModel user, UserModel createdBy);
 
     UserModel updateUpdatedBy(UserModel user, UserModel updatedBy);
+
+    void updateRole(UserModel user, String role);
+
+    void updateStatus(UserModel user, String status);
 }

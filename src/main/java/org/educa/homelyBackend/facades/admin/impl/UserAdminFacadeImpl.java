@@ -67,6 +67,20 @@ public class UserAdminFacadeImpl implements UserAdminFacade {
     public void deleteUser(Integer id) {
         userService.delete(id);
     }
+
+    @Override
+    public void updateRole(String email, String role, String tokenEmail) {
+        UserModel user = userService.findByEmailOrThrow(email);
+        userService.updateRole(user, role);
+        userService.updateUpdatedBy(user, userService.findByEmailOrThrow(tokenEmail));
+    }
+
+    @Override
+    public void updateStatus(String email, String status, String tokenEmail) {
+        UserModel user = userService.findByEmailOrThrow(email);
+        userService.updateStatus(user, status);
+        userService.updateUpdatedBy(user, userService.findByEmailOrThrow(tokenEmail));
+    }
 }
 
 
