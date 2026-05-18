@@ -57,7 +57,7 @@ public class ResetTokenApiFacadeImpl implements ResetTokenApiFacade {
         ResetTokenModel resetToken = resetTokenService.findByTokenOrThrow(request.token());
 
         if (resetToken.getExpiration().isBefore(Instant.now(clock)) || resetToken.getUsed()) {
-            resetToken.setUsed(false);
+            resetToken.setUsed(true);
             resetTokenService.save(resetToken);
             throw ExceptionUtil.manageException(
                     HttpStatus.BAD_REQUEST,
