@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping(ConfigurationRoutes.API)
 @RequiredArgsConstructor
 public class ResetTokenApiController {
 
