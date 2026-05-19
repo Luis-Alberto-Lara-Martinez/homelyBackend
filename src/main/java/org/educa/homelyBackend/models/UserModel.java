@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -18,8 +17,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -29,6 +29,8 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 @Builder
 @Entity
 @Table(
@@ -37,8 +39,7 @@ import java.util.Set;
                 @Index(name = "idx_users_role_id", columnList = "role_id"),
                 @Index(name = "idx_users_status_id", columnList = "status_id"),
                 @Index(name = "idx_users_created_by", columnList = "created_by"),
-                @Index(name = "idx_users_updated_by", columnList = "updated_by")
-        },
+                @Index(name = "idx_users_updated_by", columnList = "updated_by")},
         uniqueConstraints = {
                 @UniqueConstraint(name = "users_email_key", columnNames = {"email"})
         }
@@ -70,12 +71,12 @@ public class UserModel {
     @Column(name = "hashed_password")
     private String hashedPassword;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "created_at")
     private Instant createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "updated_at")
     private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -88,19 +89,11 @@ public class UserModel {
 
     @Builder.Default
     @OneToMany(mappedBy = "user")
-    private Set<ConversationModel> conversations = new LinkedHashSet<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "user")
     private Set<FavouriteModel> favourites = new LinkedHashSet<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "user")
-    private Set<PropertyModel> propertiesCreatedBy = new LinkedHashSet<>();
-
-    @Builder.Default
     @OneToMany(mappedBy = "updatedBy")
-    private Set<PropertyModel> propertiesUpdatedBy = new LinkedHashSet<>();
+    private Set<PropertyModel> properties = new LinkedHashSet<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "user")
@@ -108,9 +101,9 @@ public class UserModel {
 
     @Builder.Default
     @OneToMany(mappedBy = "createdBy")
-    private Set<UserModel> usersCreatedBy = new LinkedHashSet<>();
+    private Set<UserModel> userCreatedBy = new LinkedHashSet<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "updatedBy")
-    private Set<UserModel> usersUpdatedBy = new LinkedHashSet<>();
+    private Set<UserModel> userUpdatedBy = new LinkedHashSet<>();
 }

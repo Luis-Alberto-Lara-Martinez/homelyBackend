@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface UserStatusDao extends JpaRepository<UserStatusModel, Integer> {
-
     Optional<UserStatusModel> findByName(String name);
 }

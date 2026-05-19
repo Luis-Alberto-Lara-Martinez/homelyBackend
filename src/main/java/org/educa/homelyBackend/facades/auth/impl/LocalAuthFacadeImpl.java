@@ -1,8 +1,8 @@
 package org.educa.homelyBackend.facades.auth.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.educa.homelyBackend.dtos.requests.LocalLogInRequest;
-import org.educa.homelyBackend.dtos.requests.LocalRegisterRequest;
+import org.educa.homelyBackend.dtos.requests.LogInDtoRequest;
+import org.educa.homelyBackend.dtos.requests.RegisterDtoRequest;
 import org.educa.homelyBackend.facades.auth.LocalAuthFacade;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.business.UserService;
@@ -25,7 +25,7 @@ public class LocalAuthFacadeImpl implements LocalAuthFacade {
     private final LogInUtil logInUtil;
 
     @Override
-    public ResponseEntity<Map<String, String>> localLogIn(LocalLogInRequest request) {
+    public ResponseEntity<Map<String, String>> logIn(LogInDtoRequest request) {
         String email = request.email().toLowerCase();
         String password = request.password();
 
@@ -40,7 +40,7 @@ public class LocalAuthFacadeImpl implements LocalAuthFacade {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ResponseEntity<Map<String, String>> localRegister(LocalRegisterRequest request) {
+    public ResponseEntity<Map<String, String>> register(RegisterDtoRequest request) {
         String name = request.name().trim();
         String email = request.email().toLowerCase();
         String password = request.password();
@@ -53,6 +53,6 @@ public class LocalAuthFacadeImpl implements LocalAuthFacade {
             ).get();
         }
 
-        return logInUtil.createResponse(logInUtil.createClientAndSendWelcomeEmail(name, email, password));
+        return logInUtil.createResponse(logInUtil.createUserAndSendWelcomeEmail(name, email, password));
     }
 }

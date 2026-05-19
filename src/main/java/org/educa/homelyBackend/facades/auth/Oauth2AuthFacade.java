@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface Oauth2AuthFacade {
 
-    ResponseEntity<Map<String, String>> oauth2LogIn(Jwt jwt);
+    ResponseEntity<Map<String, String>> logIn(Jwt jwt);
 
-    ResponseEntity<Map<String, String>> oauth2Register(Jwt jwt);
+    ResponseEntity<Map<String, String>> register(Jwt jwt);
 }

@@ -2,10 +2,10 @@ package org.educa.homelyBackend.services.business;
 
 import org.educa.homelyBackend.models.PropertyStatusModel;
 
+import java.util.List;
+
 public interface PropertyStatusService {
-    PropertyStatusModel findByName(String name);
+    PropertyStatusModel findByNameOrThrow(String name);
 
-    PropertyStatusModel save(PropertyStatusModel propertyStatusModel);
-
-    void delete(PropertyStatusModel propertyStatusModel);
+    List<PropertyStatusModel> findAll();
 }

@@ -2,36 +2,21 @@ package org.educa.homelyBackend.services.business;
 
 import org.educa.homelyBackend.models.UserModel;
 import org.springframework.data.domain.Page;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
 public interface UserService {
-    Page<UserModel> findAll(Integer page, Integer size, String sortBy);
-
-    Optional<UserModel> findByEmail(String email);
+    Page<UserModel> findAll(Integer page, Integer size);
 
     UserModel findByEmailOrThrow(String email);
 
-    UserModel createUser(String email, String name, String password, String role, String status);
+    Optional<UserModel> findByEmail(String email);
 
     UserModel save(UserModel user);
 
-    void delete(Integer id);
+    UserModel update(String email, UserModel user);
 
-    UserModel updateHashedPassword(UserModel user, String password);
+    UserModel update(UserModel user, UserModel updatedUser);
 
-    UserModel updateImage(UserModel user, MultipartFile avatarFile);
-
-    UserModel updateImage(UserModel user, byte[] rawAvatarFile);
-
-    UserModel updateName(UserModel user, String name);
-
-    UserModel updateCreatedBy(UserModel user, UserModel createdBy);
-
-    UserModel updateUpdatedBy(UserModel user, UserModel updatedBy);
-
-    void updateRole(UserModel user, String role);
-
-    void updateStatus(UserModel user, String status);
+    void delete(UserModel user);
 }

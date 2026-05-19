@@ -22,8 +22,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -41,12 +39,10 @@ import java.util.Set;
 @Table(
         name = "properties",
         indexes = {
-                @Index(name = "idx_properties_id_user", columnList = "user_id"),
                 @Index(name = "idx_properties_id_type", columnList = "type_id"),
                 @Index(name = "idx_properties_status_transaction_price", columnList = "status_id, transaction_id, type_id"),
                 @Index(name = "idx_properties_id_status", columnList = "status_id"),
-                @Index(name = "idx_properties_id_transaction",
-                        columnList = "transaction_id")},
+                @Index(name = "idx_properties_id_transaction", columnList = "transaction_id")},
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uq_property_type",
@@ -63,11 +59,6 @@ public class PropertyModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserModel user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "type_id", nullable = false)
@@ -104,10 +95,6 @@ public class PropertyModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by")
     private UserModel updatedBy;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "property")
-    private Set<ConversationModel> conversations = new LinkedHashSet<>();
 
     @OneToOne(mappedBy = "property")
     private EnergyCertificateModel energyCertificate;

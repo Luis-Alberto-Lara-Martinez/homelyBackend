@@ -1,11 +1,12 @@
 package org.educa.homelyBackend.services.business;
 
 import org.educa.homelyBackend.models.PropertyExtraModel;
+import org.educa.homelyBackend.models.PropertyTypeModel;
+
+import java.util.List;
 
 public interface PropertyExtraService {
-    PropertyExtraModel findByName(String name);
+    PropertyExtraModel findByNameOrThrow(String name);
 
-    PropertyExtraModel save(PropertyExtraModel propertyExtraModel);
-
-    void delete(PropertyExtraModel propertyExtraModel);
+    List<PropertyExtraModel> findByPropertyType(PropertyTypeModel propertyTypeModel);
 }

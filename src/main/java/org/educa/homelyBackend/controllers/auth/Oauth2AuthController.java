@@ -21,11 +21,11 @@ public class Oauth2AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> oauth2LogIn(@AuthenticationPrincipal Jwt jwt) {
-        return oauth2AuthFacade.oauth2LogIn(jwt);
+        return oauth2AuthFacade.logIn(jwt);
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> oauth2Register(@AuthenticationPrincipal Jwt jwt) {
-        return oauth2AuthFacade.oauth2Register(jwt);
+        return oauth2AuthFacade.register(jwt);
     }
 }

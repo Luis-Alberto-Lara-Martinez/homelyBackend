@@ -3,8 +3,6 @@ package org.educa.homelyBackend.services.business.impl;
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.ResetTokenDao;
 import org.educa.homelyBackend.models.ResetTokenModel;
-import org.educa.homelyBackend.models.UserModel;
-import org.educa.homelyBackend.properties.RandomTokenProperties;
 import org.educa.homelyBackend.services.business.ResetTokenService;
 import org.educa.homelyBackend.services.shared.RandomTokenService;
 import org.educa.homelyBackend.utils.ExceptionUtil;
@@ -12,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -33,23 +29,19 @@ public class ResetTokenServiceImpl implements ResetTokenService {
     }
 
     @Override
-    public ResetTokenModel createResetToken(UserModel user, String token) {
-        return save(ResetTokenModel.builder()
-                .user(user)
-                .used(false)
-                .hashedToken(randomTokenService.generateHashedRandomToken(token))
-                .expiration(Instant.now(clock).plus(Duration.ofMinutes(RandomTokenProperties.EXPIRATION_MINUTES)))
-                .build());
-    }
-
-    @Override
     public ResetTokenModel save(ResetTokenModel resetToken) {
         return resetTokenDao.save(resetToken);
     }
 
     @Override
-    public ResetTokenModel updateUsed(ResetTokenModel resetToken, boolean used) {
-        resetToken.setUsed(used);
-        return save(resetToken);
+    public ResetTokenModel update(String token, ResetTokenModel resetTokenModel) {
+        ResetTokenModel existingResetToken = findByTokenOrThrow(token);
+
+        if (resetTokenModel.getUsed() != null) {
+            existingResetToken.setUsed(resetTokenModel.getUsed());
+            return save(existingResetToken);
+        }
+
+        return existingResetToken;
     }
 }

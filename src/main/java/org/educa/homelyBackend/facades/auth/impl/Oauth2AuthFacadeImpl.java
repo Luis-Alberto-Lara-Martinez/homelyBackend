@@ -20,7 +20,7 @@ public class Oauth2AuthFacadeImpl implements Oauth2AuthFacade {
     private final LogInUtil logInUtil;
 
     @Override
-    public ResponseEntity<Map<String, String>> oauth2LogIn(Jwt jwt) {
+    public ResponseEntity<Map<String, String>> logIn(Jwt jwt) {
         String email = jwt.getClaim("email");
 
         if (email == null) {
@@ -34,7 +34,7 @@ public class Oauth2AuthFacadeImpl implements Oauth2AuthFacade {
     }
 
     @Override
-    public ResponseEntity<Map<String, String>> oauth2Register(Jwt jwt) {
+    public ResponseEntity<Map<String, String>> register(Jwt jwt) {
         String email = jwt.getClaim("email");
         String name = jwt.getClaim("name");
 
@@ -52,6 +52,6 @@ public class Oauth2AuthFacadeImpl implements Oauth2AuthFacade {
             ).get();
         }
 
-        return logInUtil.createResponse(logInUtil.createClientAndSendWelcomeEmail(name, email.toLowerCase(), null));
+        return logInUtil.createResponse(logInUtil.createUserAndSendWelcomeEmail(name, email.toLowerCase(), null));
     }
 }

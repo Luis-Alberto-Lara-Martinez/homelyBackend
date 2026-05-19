@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Solicitud de Empleo - Homely</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .section-content {
+            background: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 12px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #333;
+            min-width: 100px;
+        }
+
+        .info-value {
+            color: #555;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .description-box {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #dde3f0;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        .cv-notice {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 6px;
+            color: #2e7d32;
+            font-size: 13px;
+            margin-top: 15px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .cv-notice strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            border-radius: 0 0 8px 8px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        .cta-button:hover {
+            background: #764ba2;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .info-row {
+                flex-direction: column;
+            }
+
+            .info-label {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>📋 Nueva Solicitud de Empleo</h1>
+        <p>Un candidato interesado ha enviado su solicitud</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Información Personal -->
+        <div class="section">
+            <div class="section-title">👤 Información del Candidato</div>
+            <div class="section-content">
+                <div class="info-row">
+                    <div class="info-label">Nombre:</div>
+                    <div class="info-value" th:text="${name}">Juan García</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value" th:text="${from}">juan@example.com</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Teléfono:</div>
+                    <div class="info-value" th:text="${phone}">+34 612 345 678</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Posición -->
+        <div class="section">
+            <div class="section-title">💼 Posición Solicitada</div>
+            <div class="section-content">
+                <div class="info-row">
+                    <div class="info-value" th:text="${workingArea}"
+                         style="font-size: 16px; font-weight: 600; color: #667eea;">Agente Inmobiliario
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="section">
+            <div class="section-title">📝 Descripción</div>
+            <div class="description-box" th:text="${description}">
+                El candidato ha incluido información sobre su experiencia y motivación para trabajar con nosotros...
+            </div>
+        </div>
+
+        <!-- CV adjunto -->
+        <div class="section">
+            <div class="cv-notice">
+                <strong>📎 CV Adjunto</strong>
+                El candidato ha incluido su currículum vitae. Revísalo para más detalles sobre su experiencia y
+                cualificaciones profesionales.
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© <span th:text="${year}">2026</span> Homely. Todos los derechos reservados.</p>
+        <p style="margin-top: 10px;">Este es un correo automático de gestión de candidaturas. No responda a este
+            email.</p>
+    </div>
+</div>
+</body>
+</html>
