@@ -1,6 +1,7 @@
 package org.educa.homelyBackend.facades.business;
 
 import org.educa.homelyBackend.dtos.PropertyDto;
+import org.educa.homelyBackend.dtos.requests.CreatePropertyDtoRequest;
 import org.educa.homelyBackend.dtos.requests.PageDtoRequest;
 import org.springframework.data.domain.Page;
 
@@ -15,4 +16,6 @@ public interface PropertyFacade {
             BigDecimal longitude,
             Integer radiusKm
     );
+
+    void saveProperty(String creatorEmail, CreatePropertyDtoRequest request);
 }
