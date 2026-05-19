@@ -1,12 +1,13 @@
 package org.educa.homelyBackend.facades.business.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.educa.homelyBackend.dtos.EnergyCertificateDto;
 import org.educa.homelyBackend.dtos.PropertyAddressDto;
 import org.educa.homelyBackend.dtos.PropertyDto;
 import org.educa.homelyBackend.dtos.PropertyExtraDto;
+import org.educa.homelyBackend.dtos.PropertyImageDto;
 import org.educa.homelyBackend.dtos.ResidenceDto;
 import org.educa.homelyBackend.dtos.requests.PageDtoRequest;
-import org.educa.homelyBackend.dtos.PropertyImageDto;
 import org.educa.homelyBackend.facades.business.PropertyFacade;
 import org.educa.homelyBackend.services.business.PropertyAddressService;
 import org.educa.homelyBackend.services.business.PropertyService;
@@ -34,6 +35,17 @@ public class PropertyFacadeImpl implements PropertyFacade {
                                 .bathrooms(property.getResidence().getBathrooms())
                                 .conservation(property.getResidence().getConservation())
                                 .orientation(property.getResidence().getOrientation())
+                                .build();
+                    }
+
+                    EnergyCertificateDto energyCertificateDto = null;
+                    if (property.getEnergyCertificate() != null) {
+                        energyCertificateDto = EnergyCertificateDto.builder()
+                                .hasCertificate(property.getEnergyCertificate().getHasCertificate())
+                                .consumptionScale(property.getEnergyCertificate().getConsumptionScale())
+                                .consumptionValue(property.getEnergyCertificate().getConsumptionValue())
+                                .emissionsScale(property.getEnergyCertificate().getEmissionsScale())
+                                .emissionsValue(property.getEnergyCertificate().getEmissionsValue())
                                 .build();
                     }
 
@@ -75,6 +87,7 @@ public class PropertyFacadeImpl implements PropertyFacade {
                                     .longitude(property.getPropertyAddress().getLongitude())
                                     .build())
                             .residence(residence)
+                            .energyCertificate(energyCertificateDto)
                             .build();
                 });
     }
@@ -91,6 +104,17 @@ public class PropertyFacadeImpl implements PropertyFacade {
                                 .bathrooms(address.getProperty().getResidence().getBathrooms())
                                 .conservation(address.getProperty().getResidence().getConservation())
                                 .orientation(address.getProperty().getResidence().getOrientation())
+                                .build();
+                    }
+
+                    EnergyCertificateDto energyCertificateDto = null;
+                    if (address.getProperty().getEnergyCertificate() != null) {
+                        energyCertificateDto = EnergyCertificateDto.builder()
+                                .hasCertificate(address.getProperty().getEnergyCertificate().getHasCertificate())
+                                .consumptionScale(address.getProperty().getEnergyCertificate().getConsumptionScale())
+                                .consumptionValue(address.getProperty().getEnergyCertificate().getConsumptionValue())
+                                .emissionsScale(address.getProperty().getEnergyCertificate().getEmissionsScale())
+                                .emissionsValue(address.getProperty().getEnergyCertificate().getEmissionsValue())
                                 .build();
                     }
                     return PropertyDto.builder()
@@ -131,6 +155,7 @@ public class PropertyFacadeImpl implements PropertyFacade {
                                     .longitude(address.getLongitude())
                                     .build())
                             .residence(residence)
+                            .energyCertificate(energyCertificateDto)
                             .build();
                 }).toList();
     }

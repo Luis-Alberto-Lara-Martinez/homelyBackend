@@ -27,6 +27,7 @@ public record PropertyDto(
         List<PropertyImageDto> images,
         List<PropertyExtraDto> extras,
         PropertyAddressDto address,
-        ResidenceDto residence
+        ResidenceDto residence,
+        EnergyCertificateDto energyCertificate
 ) {
 }
