@@ -3,11 +3,12 @@ package org.educa.homelyBackend.services.business.impl;
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.daos.FavouriteDao;
 import org.educa.homelyBackend.models.FavouriteModel;
+import org.educa.homelyBackend.models.PropertyModel;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.business.FavouriteService;
-import org.educa.homelyBackend.utils.ExceptionUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,12 +17,8 @@ public class FavouriteServiceImpl implements FavouriteService {
     private final FavouriteDao favouriteDao;
 
     @Override
-    public FavouriteModel findByUserOrThrow(UserModel user) {
-        return favouriteDao.findByUser(user)
-                .orElseThrow(() -> ExceptionUtil.manageException(
-                        HttpStatus.NOT_FOUND,
-                        "No se encontraron favoritos para el usuario con ID: " + user.getId()
-                ).get());
+    public List<FavouriteModel> findAllByUser(UserModel user) {
+        return favouriteDao.findAllByUser(user);
     }
 
     @Override
@@ -30,7 +27,7 @@ public class FavouriteServiceImpl implements FavouriteService {
     }
 
     @Override
-    public void delete(FavouriteModel favouriteModel) {
-        favouriteDao.delete(favouriteModel);
+    public void deleteByUserAndProperty(UserModel user, PropertyModel property) {
+        favouriteDao.deleteByUserAndProperty(user, property);
     }
 }

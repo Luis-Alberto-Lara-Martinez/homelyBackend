@@ -3,17 +3,21 @@ package org.educa.homelyBackend.controllers.business;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.PropertyDto;
+import org.educa.homelyBackend.dtos.requests.CreatePropertyDtoRequest;
 import org.educa.homelyBackend.dtos.requests.FindPropertiesWithinRadiusDtoRequest;
 import org.educa.homelyBackend.dtos.requests.PageDtoRequest;
 import org.educa.homelyBackend.facades.business.PropertyFacade;
 import org.educa.homelyBackend.routes.ConfigurationRoutes;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,5 +42,13 @@ public class PropertyController {
                 request.radiusKm()
         );
     }
-}
 
+    @PostMapping(ConfigurationRoutes.ADMIN + "/property")
+    public ResponseEntity<Map<String, String>> saveProperty(
+            @AuthenticationPrincipal String email,
+            @Valid @ModelAttribute CreatePropertyDtoRequest request
+    ) {
+        propertyFacade.saveProperty(email, request);
+        return ResponseEntity.ok(Map.of("message", "Propiedad creada correctamente"));
+    }
+}

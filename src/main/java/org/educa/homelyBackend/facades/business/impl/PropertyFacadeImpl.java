@@ -13,14 +13,17 @@ import org.educa.homelyBackend.facades.business.PropertyFacade;
 import org.educa.homelyBackend.models.EnergyCertificateModel;
 import org.educa.homelyBackend.models.PropertyAddressModel;
 import org.educa.homelyBackend.models.PropertyExtraModel;
+import org.educa.homelyBackend.models.PropertyImageModel;
 import org.educa.homelyBackend.models.PropertyModel;
 import org.educa.homelyBackend.models.ResidenceModel;
 import org.educa.homelyBackend.services.business.PropertyAddressService;
+import org.educa.homelyBackend.services.business.PropertyImageService;
 import org.educa.homelyBackend.services.business.PropertyService;
 import org.educa.homelyBackend.services.business.PropertyStatusService;
 import org.educa.homelyBackend.services.business.PropertyTransactionService;
 import org.educa.homelyBackend.services.business.PropertyTypeService;
 import org.educa.homelyBackend.services.business.UserService;
+import org.educa.homelyBackend.services.shared.CloudinaryService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +41,8 @@ public class PropertyFacadeImpl implements PropertyFacade {
     private final PropertyTypeService propertyTypeService;
     private final PropertyStatusService propertyStatusService;
     private final UserService userService;
+    private final PropertyImageService propertyImageService;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public Page<PropertyDto> findAllProperties(PageDtoRequest request) {
@@ -238,10 +243,17 @@ public class PropertyFacadeImpl implements PropertyFacade {
             propertyModel.setResidence(residence);
         }
 
-        // Nota: Las imágenes de la propiedad se suelen guardar en un paso posterior
-        // tras subirlas a Cloudinary para obtener sus URLs, por eso no las añadimos aquí de golpe.
+        propertyModel.setPropertyImages(request.images().stream()
+                .map(imageRequest -> {
+                    String imageUrl = cloudinaryService.uploadPropertyImage(imageRequest.image(), propertyModel.getId(), imageRequest.displayOrder());
+                    return PropertyImageModel.builder()
+                            .property(propertyModel)
+                            .imageUrl(imageUrl)
+                            .displayOrder(imageRequest.displayOrder())
+                            .build();
+                }).collect(Collectors.toSet())
+        );
 
-        // 5. Guardamos todo el árbol mapeado en cascada
         propertyService.save(propertyModel);
     }
 }

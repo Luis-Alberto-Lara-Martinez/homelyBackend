@@ -1,4 +1,4 @@
-package org.educa.homelyBackend.controllers;
+package org.educa.homelyBackend.controllers.business;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
