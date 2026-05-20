@@ -7,5 +7,7 @@ import java.util.List;
 public interface PropertyTypeService {
     PropertyTypeModel findByNameOrThrow(String name);
 
+    PropertyTypeModel findById(Integer id);
+
     List<PropertyTypeModel> findAll();
 }

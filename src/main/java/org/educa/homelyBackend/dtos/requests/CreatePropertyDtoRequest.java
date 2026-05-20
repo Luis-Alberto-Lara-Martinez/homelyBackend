@@ -16,7 +16,6 @@ public record CreatePropertyDtoRequest(
         String description,
         Integer surface,
         BigDecimal price,
-        String updatedBy,
         List<CreatePropertyImageDtoRequest> images,
         List<PropertyExtraDto> extras,
         PropertyAddressDto address,

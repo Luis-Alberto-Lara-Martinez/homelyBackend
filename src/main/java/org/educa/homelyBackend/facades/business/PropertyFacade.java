@@ -1,7 +1,9 @@
 package org.educa.homelyBackend.facades.business;
 
 import org.educa.homelyBackend.dtos.PropertyDto;
+import org.educa.homelyBackend.dtos.PropertyExtraDto;
 import org.educa.homelyBackend.dtos.requests.CreatePropertyDtoRequest;
+import org.educa.homelyBackend.dtos.requests.GeneratePropertyDescriptionByAIDtoRequest;
 import org.educa.homelyBackend.dtos.requests.PageDtoRequest;
 import org.springframework.data.domain.Page;
 
@@ -22,4 +24,8 @@ public interface PropertyFacade {
     void saveProperty(String creatorEmail, CreatePropertyDtoRequest request);
 
     void deletePropertyById(Integer id);
+
+    List<PropertyExtraDto> findAllPropertyExtraById(Integer id);
+
+    String generateDescription(GeneratePropertyDescriptionByAIDtoRequest request);
 }

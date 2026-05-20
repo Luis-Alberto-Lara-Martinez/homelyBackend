@@ -9,4 +9,6 @@ public interface PropertyExtraService {
     PropertyExtraModel findByNameOrThrow(String name);
 
     List<PropertyExtraModel> findByPropertyType(PropertyTypeModel propertyTypeModel);
+
+    PropertyExtraModel save(PropertyExtraModel propertyExtraModel);
 }

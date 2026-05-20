@@ -3,8 +3,10 @@ package org.educa.homelyBackend.controllers.business;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.educa.homelyBackend.dtos.PropertyDto;
+import org.educa.homelyBackend.dtos.PropertyExtraDto;
 import org.educa.homelyBackend.dtos.requests.CreatePropertyDtoRequest;
 import org.educa.homelyBackend.dtos.requests.FindPropertiesWithinRadiusDtoRequest;
+import org.educa.homelyBackend.dtos.requests.GeneratePropertyDescriptionByAIDtoRequest;
 import org.educa.homelyBackend.dtos.requests.PageDtoRequest;
 import org.educa.homelyBackend.facades.business.PropertyFacade;
 import org.educa.homelyBackend.routes.ConfigurationRoutes;
@@ -13,10 +15,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -64,5 +66,15 @@ public class PropertyController {
     public ResponseEntity<Map<String, String>> deleteProperty(@Valid @PathVariable Integer id) {
         propertyFacade.deletePropertyById(id);
         return ResponseEntityUtil.ok("Propiedad eliminada correctamente");
+    }
+
+    @GetMapping(ConfigurationRoutes.ADMIN + "/extras/{typeId}")
+    public List<PropertyExtraDto> findAllPropertyExtrasByTypeId(@Valid @PathVariable Integer typeId) {
+        return propertyFacade.findAllPropertyExtraById(typeId);
+    }
+
+    @PostMapping(ConfigurationRoutes.ADMIN + "/property/generate-description")
+    public ResponseEntity<Map<String, String>> generateDescription(@Valid @RequestBody GeneratePropertyDescriptionByAIDtoRequest request) {
+        return ResponseEntity.ok(Map.of("description", propertyFacade.generateDescription(request)));
     }
 }

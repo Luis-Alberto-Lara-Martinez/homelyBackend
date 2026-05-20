@@ -26,6 +26,15 @@ public class PropertyTypeServiceImpl implements PropertyTypeService {
     }
 
     @Override
+    public PropertyTypeModel findById(Integer id) {
+        return propertyTypeDao.findById(id)
+                .orElseThrow(() -> ExceptionUtil.manageException(
+                        HttpStatus.NOT_FOUND,
+                        "El tipo de propiedad con el ID '" + id + "' no fue encontrado."
+                ).get());
+    }
+
+    @Override
     public List<PropertyTypeModel> findAll() {
         return propertyTypeDao.findAll();
     }

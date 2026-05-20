@@ -8,6 +8,7 @@ import org.educa.homelyBackend.dtos.PropertyExtraDto;
 import org.educa.homelyBackend.dtos.PropertyImageDto;
 import org.educa.homelyBackend.dtos.ResidenceDto;
 import org.educa.homelyBackend.dtos.requests.CreatePropertyDtoRequest;
+import org.educa.homelyBackend.dtos.requests.GeneratePropertyDescriptionByAIDtoRequest;
 import org.educa.homelyBackend.dtos.requests.PageDtoRequest;
 import org.educa.homelyBackend.facades.business.PropertyFacade;
 import org.educa.homelyBackend.models.EnergyCertificateModel;
@@ -17,13 +18,17 @@ import org.educa.homelyBackend.models.PropertyImageModel;
 import org.educa.homelyBackend.models.PropertyModel;
 import org.educa.homelyBackend.models.ResidenceModel;
 import org.educa.homelyBackend.services.business.PropertyAddressService;
+import org.educa.homelyBackend.services.business.PropertyExtraService;
 import org.educa.homelyBackend.services.business.PropertyImageService;
 import org.educa.homelyBackend.services.business.PropertyService;
 import org.educa.homelyBackend.services.business.PropertyStatusService;
 import org.educa.homelyBackend.services.business.PropertyTransactionService;
 import org.educa.homelyBackend.services.business.PropertyTypeService;
 import org.educa.homelyBackend.services.business.UserService;
+import org.educa.homelyBackend.services.business.EnergyCertificateService;
+import org.educa.homelyBackend.services.business.ResidenceService;
 import org.educa.homelyBackend.services.shared.CloudinaryService;
+import org.educa.homelyBackend.services.shared.GroqService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +48,10 @@ public class PropertyFacadeImpl implements PropertyFacade {
     private final UserService userService;
     private final PropertyImageService propertyImageService;
     private final CloudinaryService cloudinaryService;
+    private final PropertyExtraService propertyExtraService;
+    private final EnergyCertificateService energyCertificateService;
+    private final ResidenceService residenceService;
+    private final GroqService groqService;
 
     @Override
     public Page<PropertyDto> findAllProperties(PageDtoRequest request) {
@@ -262,31 +271,25 @@ public class PropertyFacadeImpl implements PropertyFacade {
                 .surface(request.surface())
                 .price(request.price())
                 .updatedBy(userService.findByEmailOrThrow(creatorEmail))
-                .propertyExtras(request.extras().stream()
-                        .map(extra -> PropertyExtraModel.builder()
-                                .id(extra.id())
-                                .name(extra.name())
-                                .build()
-                        ).collect(Collectors.toSet()))
+                        // extras will be linked after saving the property (owner side is PropertyExtraModel)
                 .build();
 
-        // 2. Construimos y vinculamos el Certificado Energético
+        // 2. Construimos el Certificado Energético (no lo vinculamos todavía)
+        EnergyCertificateModel energyCertificate = null;
         if (request.energyCertificate() != null) {
-            EnergyCertificateModel energyCertificate = EnergyCertificateModel.builder()
-                    .property(propertyModel) // Vinculamos el padre para el @MapsId
+            energyCertificate = EnergyCertificateModel.builder()
                     .hasCertificate(request.energyCertificate().hasCertificate())
                     .consumptionScale(request.energyCertificate().consumptionScale())
                     .consumptionValue(request.energyCertificate().consumptionValue())
                     .emissionsScale(request.energyCertificate().emissionsScale())
                     .emissionsValue(request.energyCertificate().emissionsValue())
                     .build();
-            propertyModel.setEnergyCertificate(energyCertificate);
         }
 
         // 3. Construimos y vinculamos la Dirección (PropertyAddressModel)
+        PropertyAddressModel address = null;
         if (request.address() != null) {
-            PropertyAddressModel address = PropertyAddressModel.builder()
-                    .property(propertyModel) // Vinculamos el padre
+            address = PropertyAddressModel.builder()
                     .street(request.address().street())
                     .number(request.address().number())
                     .floor(request.address().floor())
@@ -298,37 +301,87 @@ public class PropertyFacadeImpl implements PropertyFacade {
                     .latitude(request.address().latitude())
                     .longitude(request.address().longitude())
                     .build();
-            propertyModel.setPropertyAddress(address);
         }
 
         // 4. Construimos y vinculamos los datos de Residencia (si aplican al tipo de propiedad)
+        ResidenceModel residence = null;
         if (request.residence() != null) {
-            ResidenceModel residence = ResidenceModel.builder()
-                    .property(propertyModel) // Vinculamos el padre
+            residence = ResidenceModel.builder()
                     .bedrooms(request.residence().bedrooms())
                     .bathrooms(request.residence().bathrooms())
                     .conservation(request.residence().conservation())
                     .orientation(request.residence().orientation())
                     .build();
-            propertyModel.setResidence(residence);
         }
 
-        propertyModel.setPropertyImages(request.images().stream()
-                .map(imageRequest -> {
-                    String imageUrl = cloudinaryService.uploadPropertyImage(imageRequest.image(), propertyModel.getId(), imageRequest.displayOrder());
-                    return PropertyImageModel.builder()
-                            .property(propertyModel)
-                            .imageUrl(imageUrl)
-                            .displayOrder(imageRequest.displayOrder())
-                            .build();
-                }).collect(Collectors.toSet())
-        );
+        // 5. Guardamos la propiedad para obtener el id y que las relaciones se puedan persistir
+        PropertyModel savedProperty = propertyService.save(propertyModel);
 
-        propertyService.save(propertyModel);
+        // 6. Asociamos los extras (lado propietario) y los guardamos
+        if (request.extras() != null && !request.extras().isEmpty()) {
+            for (var extraDto : request.extras()) {
+                PropertyExtraModel extra = propertyExtraService.findByNameOrThrow(extraDto.name());
+                extra.getProperties().add(savedProperty);
+                propertyExtraService.save(extra);
+            }
+        }
+
+        // 7. Subimos y persistimos las imágenes (si las hay)
+        if (request.images() != null && !request.images().isEmpty()) {
+            var images = request.images().stream()
+                    .map(imageRequest -> {
+                        String imageUrl = cloudinaryService.uploadPropertyImage(imageRequest.image(), savedProperty.getId(), imageRequest.displayOrder());
+                        PropertyImageModel imageModel = PropertyImageModel.builder()
+                                .property(savedProperty)
+                                .imageUrl(imageUrl)
+                                .displayOrder(imageRequest.displayOrder())
+                                .build();
+                        return propertyImageService.save(imageModel);
+                    }).collect(Collectors.toSet());
+
+            savedProperty.setPropertyImages(images);
+        }
+
+        // 9. Guardamos las entidades dependientes que usan @MapsId (address, residence, energyCertificate)
+        if (address != null) {
+            address.setProperty(savedProperty);
+            PropertyAddressModel savedAddress = propertyAddressService.save(address);
+            savedProperty.setPropertyAddress(savedAddress);
+        }
+
+        if (residence != null) {
+            residence.setProperty(savedProperty);
+            ResidenceModel savedResidence = residenceService.save(residence);
+            savedProperty.setResidence(savedResidence);
+        }
+
+        if (energyCertificate != null) {
+            energyCertificate.setProperty(savedProperty);
+            EnergyCertificateModel savedEnergy = energyCertificateService.save(energyCertificate);
+            savedProperty.setEnergyCertificate(savedEnergy);
+        }
+
+        propertyService.save(savedProperty);
     }
 
     @Override
     public void deletePropertyById(Integer id) {
         propertyService.deleteById(id);
+    }
+
+    @Override
+    public List<PropertyExtraDto> findAllPropertyExtraById(Integer id) {
+        return propertyExtraService.findByPropertyType(propertyTypeService.findById(id))
+                .stream()
+                .map(extra -> PropertyExtraDto.builder()
+                        .id(extra.getId())
+                        .name(extra.getName())
+                        .build())
+                .toList();
+    }
+
+    @Override
+    public String generateDescription(GeneratePropertyDescriptionByAIDtoRequest request) {
+        return groqService.generatePropertyDescription(request.toString());
     }
 }

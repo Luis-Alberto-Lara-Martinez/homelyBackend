@@ -29,6 +29,11 @@ public class PropertyExtraServiceImpl implements PropertyExtraService {
 
     @Override
     public List<PropertyExtraModel> findByPropertyType(PropertyTypeModel propertyTypeModel) {
-        return propertyExtraDao.findByPropertyTypes(Set.of(propertyTypeModel));
+        return propertyExtraDao.findByPropertyTypesIn(Set.of(propertyTypeModel));
+    }
+
+    @Override
+    public PropertyExtraModel save(PropertyExtraModel propertyExtraModel) {
+        return propertyExtraDao.save(propertyExtraModel);
     }
 }
