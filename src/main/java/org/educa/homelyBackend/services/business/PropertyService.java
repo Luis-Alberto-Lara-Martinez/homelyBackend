@@ -10,5 +10,5 @@ public interface PropertyService {
 
     PropertyModel save(PropertyModel propertyModel);
 
-    void delete(PropertyModel property);
+    void deleteById(Integer id);
 }

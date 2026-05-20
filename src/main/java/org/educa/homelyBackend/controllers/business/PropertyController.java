@@ -8,12 +8,15 @@ import org.educa.homelyBackend.dtos.requests.FindPropertiesWithinRadiusDtoReques
 import org.educa.homelyBackend.dtos.requests.PageDtoRequest;
 import org.educa.homelyBackend.facades.business.PropertyFacade;
 import org.educa.homelyBackend.routes.ConfigurationRoutes;
+import org.educa.homelyBackend.utils.ResponseEntityUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,5 +58,11 @@ public class PropertyController {
     ) {
         propertyFacade.saveProperty(email, request);
         return ResponseEntity.ok(Map.of("message", "Propiedad creada correctamente"));
+    }
+
+    @DeleteMapping(ConfigurationRoutes.ADMIN + "/property/{id}")
+    public ResponseEntity<Map<String, String>> deleteProperty(@Valid @PathVariable Integer id) {
+        propertyFacade.deletePropertyById(id);
+        return ResponseEntityUtil.ok("Propiedad eliminada correctamente");
     }
 }

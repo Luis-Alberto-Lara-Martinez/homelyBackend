@@ -20,4 +20,6 @@ public interface PropertyFacade {
     PropertyDto findPropertyById(Integer id);
 
     void saveProperty(String creatorEmail, CreatePropertyDtoRequest request);
+
+    void deletePropertyById(Integer id);
 }

@@ -326,4 +326,9 @@ public class PropertyFacadeImpl implements PropertyFacade {
 
         propertyService.save(propertyModel);
     }
+
+    @Override
+    public void deletePropertyById(Integer id) {
+        propertyService.deleteById(id);
+    }
 }

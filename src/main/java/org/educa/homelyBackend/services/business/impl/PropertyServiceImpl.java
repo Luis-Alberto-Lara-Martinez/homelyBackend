@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,8 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void delete(PropertyModel property) {
-        propertyDao.delete(property);
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteById(Integer id) {
+        propertyDao.deleteById(id);
     }
 }
