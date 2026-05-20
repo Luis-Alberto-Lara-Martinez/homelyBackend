@@ -7,6 +7,7 @@ import org.educa.homelyBackend.models.PropertyModel;
 import org.educa.homelyBackend.models.UserModel;
 import org.educa.homelyBackend.services.business.FavouriteService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class FavouriteServiceImpl implements FavouriteService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteByUserAndProperty(UserModel user, PropertyModel property) {
         favouriteDao.deleteByUserAndProperty(user, property);
     }

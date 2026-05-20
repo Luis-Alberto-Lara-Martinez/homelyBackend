@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,9 +38,9 @@ public class FavouriteController {
         return ResponseEntityUtil.ok("Guardado como favorito");
     }
 
-    @DeleteMapping("")
-    public ResponseEntity<Map<String, String>> delete(@AuthenticationPrincipal String email, @Valid @RequestBody SaveFavouriteDtoRequest request) {
-        favouriteFacade.delete(email, request.propertyId());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> delete(@AuthenticationPrincipal String email, @Valid @PathVariable Integer id) {
+        favouriteFacade.delete(email, id);
         return ResponseEntityUtil.ok("Eliminado de favoritos");
     }
 }
