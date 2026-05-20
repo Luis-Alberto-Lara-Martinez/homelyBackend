@@ -181,6 +181,76 @@ public class PropertyFacadeImpl implements PropertyFacade {
     }
 
     @Override
+    public PropertyDto findPropertyById(Integer id) {
+        PropertyModel property = propertyService.findByIdOrThrow(id);
+
+
+        return PropertyDto.builder()
+                .id(property.getId())
+                .type(property.getType().getName())
+                .status(property.getStatus().getName())
+                .transaction(property.getTransaction().getName())
+                .title(property.getTitle())
+                .description(property.getDescription())
+                .surface(property.getSurface())
+                .price(property.getPrice())
+                .createdAt(property.getCreatedAt())
+                .updatedAt(property.getUpdatedAt())
+                .updatedBy(
+                        property.getUpdatedBy() != null
+                                ? property.getUpdatedBy().getName()
+                                : null
+                )
+                .images(property.getPropertyImages().stream()
+                        .map(image -> PropertyImageDto.builder()
+                                .id(image.getId())
+                                .imageUrl(image.getImageUrl())
+                                .displayOrder(image.getDisplayOrder())
+                                .build())
+                        .toList())
+                .extras(property.getPropertyExtras().stream()
+                        .map(extra -> PropertyExtraDto.builder()
+                                .id(extra.getId())
+                                .name(extra.getName())
+                                .build())
+                        .toList())
+                .address(PropertyAddressDto.builder()
+                        .street(property.getPropertyAddress().getStreet())
+                        .number(property.getPropertyAddress().getNumber())
+                        .floor(property.getPropertyAddress().getFloor())
+                        .door(property.getPropertyAddress().getDoor())
+                        .postalCode(property.getPropertyAddress().getPostalCode())
+                        .city(property.getPropertyAddress().getCity())
+                        .province(property.getPropertyAddress().getProvince())
+                        .country(property.getPropertyAddress().getCountry())
+                        .latitude(property.getPropertyAddress().getLatitude())
+                        .longitude(property.getPropertyAddress().getLongitude())
+                        .build())
+                .residence(
+                        property.getResidence() != null
+                                ? ResidenceDto.builder()
+                                .bedrooms(property.getResidence().getBedrooms())
+                                .bathrooms(property.getResidence().getBathrooms())
+                                .conservation(property.getResidence().getConservation())
+                                .orientation(property.getResidence().getOrientation())
+                                .build()
+                                : null
+                )
+                .energyCertificate(
+                        property.getEnergyCertificate() != null
+                                ? EnergyCertificateDto.builder()
+                                .hasCertificate(property.getEnergyCertificate().getHasCertificate())
+                                .consumptionScale(property.getEnergyCertificate().getConsumptionScale())
+                                .consumptionValue(property.getEnergyCertificate().getConsumptionValue())
+                                .emissionsScale(property.getEnergyCertificate().getEmissionsScale())
+                                .emissionsValue(property.getEnergyCertificate().getEmissionsValue())
+                                .build()
+                                : null
+                )
+                .build();
+    }
+
+    @Override
     public void saveProperty(String creatorEmail, CreatePropertyDtoRequest request) {
         // 1. Construimos la entidad principal (PropertyModel) sin las relaciones OneToOne todavía
         PropertyModel propertyModel = PropertyModel.builder()

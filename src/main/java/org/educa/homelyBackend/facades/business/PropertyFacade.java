@@ -17,5 +17,7 @@ public interface PropertyFacade {
             Integer radiusKm
     );
 
+    PropertyDto findPropertyById(Integer id);
+
     void saveProperty(String creatorEmail, CreatePropertyDtoRequest request);
 }
